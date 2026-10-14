@@ -1,0 +1,17 @@
+[package]
+name = "frontier-telemetry"
+description = "Run telemetry: metric ingestion, sinks and local JSONL/Arrow storage"
+version.workspace = true
+edition.workspace = true
+license = "Apache-2.0"
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+frontier-core.workspace = true
+frontier-data.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+
+[dev-dependencies]
+tempfile = "3"

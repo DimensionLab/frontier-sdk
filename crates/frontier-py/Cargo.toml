@@ -1,0 +1,25 @@
+[package]
+name = "frontier-py"
+description = "PyO3 bindings exposing Frontier's Rust core to the Python SDK (module `frontier_native`)"
+version.workspace = true
+edition.workspace = true
+license = "Apache-2.0"
+authors.workspace = true
+repository.workspace = true
+
+[lib]
+name = "frontier_native"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+frontier-core.workspace = true
+frontier-data.workspace = true
+frontier-prep-kernels.workspace = true
+frontier-telemetry.workspace = true
+frontier-connectors.workspace = true
+frontier-connector-openfoam.workspace = true
+frontier-connector-vtk.workspace = true
+pyo3 = { workspace = true, features = ["abi3-py311"] }
+numpy.workspace = true
+rayon.workspace = true
+serde_json.workspace = true

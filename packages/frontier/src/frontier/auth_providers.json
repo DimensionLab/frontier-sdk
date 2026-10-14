@@ -1,0 +1,536 @@
+[
+  {
+    "category": "Frontier",
+    "env": [
+      "FRONTIER_TOKEN"
+    ],
+    "fields": [
+      {
+        "env": [
+          "FRONTIER_TOKEN"
+        ],
+        "name": "token",
+        "required": true,
+        "secret": true,
+        "title": "Access token"
+      }
+    ],
+    "id": "frontier",
+    "kind": "token",
+    "scopes_hint": "token issued by your Frontier administrator; sent as a Bearer header to the control plane",
+    "title": "Frontier server"
+  },
+  {
+    "category": "Frontier",
+    "env": [
+      "FRONTIER_OIDC_CLIENT_SECRET"
+    ],
+    "fields": [
+      {
+        "env": [
+          "FRONTIER_OIDC_CLIENT_SECRET"
+        ],
+        "name": "client_secret",
+        "required": true,
+        "secret": true,
+        "title": "Client secret"
+      }
+    ],
+    "id": "frontier-oidc",
+    "kind": "token",
+    "scopes_hint": "client secret of the OIDC application registered for the control plane (`auth.mode = \"oidc\"`); only the server needs it, and only when the provider issues one",
+    "title": "Frontier OIDC client"
+  },
+  {
+    "category": "Datasets hub",
+    "env": [
+      "HF_TOKEN",
+      "HUGGING_FACE_HUB_TOKEN"
+    ],
+    "fields": [
+      {
+        "env": [
+          "HF_TOKEN",
+          "HUGGING_FACE_HUB_TOKEN"
+        ],
+        "name": "token",
+        "required": true,
+        "secret": true,
+        "title": "Access token"
+      }
+    ],
+    "help_url": "https://huggingface.co/settings/tokens",
+    "id": "huggingface",
+    "kind": "token",
+    "scopes_hint": "read access to gated datasets you have accepted",
+    "test": "frontier.auth:test_huggingface",
+    "test_http": {
+      "auth": "bearer",
+      "identity": "/name",
+      "url": "https://huggingface.co/api/whoami-v2",
+      "url_path": "/api/whoami-v2",
+      "url_setting": "hub.huggingface_endpoint"
+    },
+    "title": "Hugging Face"
+  },
+  {
+    "category": "Cloud compute",
+    "env": [
+      "RUNPOD_API_KEY"
+    ],
+    "fields": [
+      {
+        "env": [
+          "RUNPOD_API_KEY"
+        ],
+        "name": "api_key",
+        "required": true,
+        "secret": true,
+        "title": "API key"
+      }
+    ],
+    "help_url": "https://www.runpod.io/console/user/settings",
+    "id": "runpod",
+    "kind": "api_key",
+    "scopes_hint": "read/write key: renting and releasing pods on your account",
+    "test": "frontier.auth:test_runpod",
+    "test_http": {
+      "auth": "bearer",
+      "count": "",
+      "url": "https://rest.runpod.io/v1/pods"
+    },
+    "title": "RunPod"
+  },
+  {
+    "category": "Cloud compute",
+    "env": [
+      "ANYSCALE_API_KEY"
+    ],
+    "fields": [
+      {
+        "env": [
+          "ANYSCALE_API_KEY"
+        ],
+        "name": "api_key",
+        "required": true,
+        "secret": true,
+        "title": "API key"
+      },
+      {
+        "env": [
+          "ANYSCALE_CLOUD_ID"
+        ],
+        "name": "cloud_id",
+        "required": false,
+        "secret": false,
+        "title": "Cloud id"
+      },
+      {
+        "env": [
+          "ANYSCALE_PROJECT_ID"
+        ],
+        "name": "project_id",
+        "required": false,
+        "secret": false,
+        "title": "Project id"
+      }
+    ],
+    "help_url": "https://console.anyscale.com/credentials",
+    "id": "anyscale",
+    "kind": "api_key",
+    "scopes_hint": "submitting and stopping jobs in the chosen cloud and project",
+    "test_http": {
+      "auth": "bearer",
+      "identity": "/result/email",
+      "url": "https://console.anyscale.com/api/v2/userinfo/"
+    },
+    "title": "Anyscale"
+  },
+  {
+    "category": "Cloud solvers",
+    "env": [
+      "FLOW360_APIKEY"
+    ],
+    "fields": [
+      {
+        "env": [
+          "FLOW360_APIKEY"
+        ],
+        "name": "api_key",
+        "required": true,
+        "secret": true,
+        "title": "API key"
+      }
+    ],
+    "help_url": "https://flow360.simulation.cloud/account",
+    "id": "flow360",
+    "kind": "api_key",
+    "scopes_hint": "read access to the projects and cases to import",
+    "test_http": {
+      "auth": "header:simcloud-api-key",
+      "url": "https://flow360-api.simulation.cloud/v2/projects?page=0&size=1"
+    },
+    "title": "Flexcompute Flow360"
+  },
+  {
+    "category": "Cloud solvers",
+    "env": [
+      "LC_API_KEY"
+    ],
+    "fields": [
+      {
+        "env": [
+          "LC_API_KEY"
+        ],
+        "name": "api_key",
+        "required": true,
+        "secret": true,
+        "title": "API key"
+      }
+    ],
+    "help_url": "https://app.luminarycloud.com/account/api-keys",
+    "id": "luminary",
+    "kind": "api_key",
+    "scopes_hint": "read access to the projects and simulations to import",
+    "title": "Luminary Cloud"
+  },
+  {
+    "category": "Cloud solvers",
+    "env": [
+      "SIMSCALE_API_KEY"
+    ],
+    "fields": [
+      {
+        "env": [
+          "SIMSCALE_API_KEY"
+        ],
+        "name": "api_key",
+        "required": true,
+        "secret": true,
+        "title": "API key"
+      },
+      {
+        "env": [
+          "SIMSCALE_API_URL"
+        ],
+        "name": "api_url",
+        "required": false,
+        "secret": false,
+        "title": "API URL"
+      }
+    ],
+    "help_url": "https://www.simscale.com/dashboard/user-settings/api-keys",
+    "id": "simscale",
+    "kind": "api_key",
+    "scopes_hint": "read access to the projects and simulation runs to import",
+    "test_http": {
+      "auth": "header:X-API-KEY",
+      "url": "https://api.simscale.com/v0/projects?limit=1",
+      "url_field": "api_url",
+      "url_path": "/v0/projects?limit=1"
+    },
+    "title": "SimScale"
+  },
+  {
+    "category": "Cloud solvers",
+    "env": [
+      "RESCALE_API_KEY"
+    ],
+    "fields": [
+      {
+        "env": [
+          "RESCALE_API_KEY"
+        ],
+        "name": "api_key",
+        "required": true,
+        "secret": true,
+        "title": "API token"
+      },
+      {
+        "env": [
+          "RESCALE_API_URL"
+        ],
+        "name": "api_url",
+        "required": false,
+        "secret": false,
+        "title": "Platform URL"
+      }
+    ],
+    "help_url": "https://platform.rescale.com/user/settings/api-key/",
+    "id": "rescale",
+    "kind": "api_key",
+    "scopes_hint": "read access to the jobs whose output files are imported",
+    "test_http": {
+      "auth": "header:Authorization:Token ",
+      "identity": "/email",
+      "url": "https://platform.rescale.com/api/v2/users/me/",
+      "url_field": "api_url",
+      "url_path": "/api/v2/users/me/"
+    },
+    "title": "Rescale"
+  },
+  {
+    "category": "Object stores",
+    "env": [],
+    "fields": [
+      {
+        "env": [
+          "AWS_ACCESS_KEY_ID"
+        ],
+        "name": "access_key_id",
+        "required": true,
+        "secret": false,
+        "title": "Access key id"
+      },
+      {
+        "env": [
+          "AWS_SECRET_ACCESS_KEY"
+        ],
+        "name": "secret_access_key",
+        "required": true,
+        "secret": true,
+        "title": "Secret access key"
+      },
+      {
+        "env": [
+          "AWS_SESSION_TOKEN"
+        ],
+        "name": "session_token",
+        "required": false,
+        "secret": true,
+        "title": "Session token"
+      },
+      {
+        "env": [
+          "AWS_DEFAULT_REGION"
+        ],
+        "name": "region",
+        "required": false,
+        "secret": false,
+        "title": "Region"
+      },
+      {
+        "env": [
+          "AWS_ENDPOINT_URL"
+        ],
+        "name": "endpoint_url",
+        "required": false,
+        "secret": false,
+        "title": "Endpoint URL"
+      }
+    ],
+    "help_url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html",
+    "id": "s3",
+    "kind": "api_key",
+    "scopes_hint": "read access to the buckets that hold datasets; write access where runs store artifacts",
+    "title": "Amazon S3 (or S3-compatible store)"
+  },
+  {
+    "category": "Object stores",
+    "env": [],
+    "fields": [
+      {
+        "env": [
+          "GOOGLE_APPLICATION_CREDENTIALS"
+        ],
+        "name": "credentials_file",
+        "required": true,
+        "secret": false,
+        "title": "Service account key file"
+      }
+    ],
+    "help_url": "https://cloud.google.com/iam/docs/keys-create-delete",
+    "id": "gcs",
+    "kind": "file",
+    "scopes_hint": "Storage Object Viewer on the dataset buckets; the key file itself stays where it is, only its path is stored",
+    "title": "Google Cloud Storage"
+  },
+  {
+    "category": "Object stores",
+    "env": [],
+    "fields": [
+      {
+        "env": [
+          "AZURE_STORAGE_ACCOUNT"
+        ],
+        "name": "account",
+        "required": true,
+        "secret": false,
+        "title": "Storage account"
+      },
+      {
+        "env": [
+          "AZURE_STORAGE_KEY"
+        ],
+        "name": "key",
+        "required": true,
+        "secret": true,
+        "title": "Account key or SAS token"
+      }
+    ],
+    "help_url": "https://learn.microsoft.com/azure/storage/common/storage-account-keys-manage",
+    "id": "azure",
+    "kind": "api_key",
+    "scopes_hint": "read access to the containers that hold datasets",
+    "title": "Azure Blob Storage"
+  },
+  {
+    "category": "Compute sites",
+    "env": [],
+    "fields": [
+      {
+        "env": [
+          "FRONTIER_REGISTRY_SERVER"
+        ],
+        "name": "server",
+        "required": true,
+        "secret": false,
+        "title": "Registry host"
+      },
+      {
+        "env": [
+          "FRONTIER_REGISTRY_USERNAME"
+        ],
+        "name": "username",
+        "required": true,
+        "secret": false,
+        "title": "User name"
+      },
+      {
+        "env": [
+          "FRONTIER_REGISTRY_PASSWORD"
+        ],
+        "name": "password",
+        "required": true,
+        "secret": true,
+        "title": "Password or access token"
+      }
+    ],
+    "id": "registry",
+    "kind": "basic",
+    "scopes_hint": "pull access to the trainer and worker images (compute.image, compute.worker_image)",
+    "title": "Container registry"
+  },
+  {
+    "category": "Compute sites",
+    "env": [],
+    "fields": [
+      {
+        "env": [
+          "FRONTIER_SSH_USER"
+        ],
+        "name": "user",
+        "required": true,
+        "secret": false,
+        "title": "Login name"
+      },
+      {
+        "env": [
+          "FRONTIER_SSH_IDENTITY"
+        ],
+        "name": "identity_file",
+        "required": false,
+        "secret": false,
+        "title": "Private key file"
+      },
+      {
+        "env": [],
+        "name": "passphrase",
+        "required": false,
+        "secret": true,
+        "title": "Key passphrase"
+      }
+    ],
+    "id": "ssh",
+    "kind": "file",
+    "scopes_hint": "default login for --on ssh / --on slurm when a site profile names none; the private key stays in its file, only the path is stored",
+    "title": "SSH and SLURM sites"
+  },
+  {
+    "category": "Model providers",
+    "env": [
+      "ANTHROPIC_API_KEY"
+    ],
+    "fields": [
+      {
+        "env": [
+          "ANTHROPIC_API_KEY"
+        ],
+        "name": "api_key",
+        "required": true,
+        "secret": true,
+        "title": "API key"
+      }
+    ],
+    "help_url": "https://console.anthropic.com/settings/keys",
+    "id": "anthropic",
+    "kind": "api_key",
+    "scopes_hint": "hosted agent sessions (`frontier prep agent run --hosted`) when policy.ai.data_leaves_site allows them",
+    "test_http": {
+      "auth": "header:x-api-key",
+      "count": "/data",
+      "url": "https://api.anthropic.com/v1/models?limit=1"
+    },
+    "title": "Anthropic"
+  },
+  {
+    "category": "Model providers",
+    "env": [
+      "OPENAI_API_KEY"
+    ],
+    "fields": [
+      {
+        "env": [
+          "OPENAI_API_KEY"
+        ],
+        "name": "api_key",
+        "required": true,
+        "secret": true,
+        "title": "API key"
+      },
+      {
+        "env": [
+          "OPENAI_BASE_URL"
+        ],
+        "name": "base_url",
+        "required": false,
+        "secret": false,
+        "title": "Base URL"
+      }
+    ],
+    "help_url": "https://platform.openai.com/api-keys",
+    "id": "openai",
+    "kind": "api_key",
+    "scopes_hint": "hosted agent sessions through the OpenAI-compatible protocol when policy.ai.data_leaves_site allows them",
+    "test_http": {
+      "auth": "bearer",
+      "count": "/data",
+      "url": "https://api.openai.com/v1/models",
+      "url_field": "base_url",
+      "url_path": "/models"
+    },
+    "title": "OpenAI (or any OpenAI-compatible hosted endpoint)"
+  },
+  {
+    "category": "Model providers",
+    "env": [
+      "TYPESAFE_API_KEY"
+    ],
+    "fields": [
+      {
+        "env": [
+          "TYPESAFE_API_KEY"
+        ],
+        "name": "api_key",
+        "required": true,
+        "secret": true,
+        "title": "API key"
+      }
+    ],
+    "help_url": "https://docs.typesafe.ai/api",
+    "id": "typesafe",
+    "kind": "api_key",
+    "scopes_hint": "System One judgments (choice / noul / score) for the judge backend; hosted, policy-gated",
+    "title": "TypeSafe (Jev judgments)"
+  }
+]

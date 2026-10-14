@@ -1,0 +1,3813 @@
+{
+  "sections": [
+    {
+      "description": "How the CLI, the TUI, the SDK and the trainer reach the control plane.",
+      "id": "client",
+      "title": "Connection"
+    },
+    {
+      "description": "Where datasets, raw downloads, caches and run records are kept.",
+      "id": "storage",
+      "title": "Storage"
+    },
+    {
+      "description": "The catalogue of public datasets and how much may be downloaded unasked.",
+      "id": "hub",
+      "title": "Datasets hub"
+    },
+    {
+      "description": "Defaults for `frontier run`, `frontier sweep` and `frontier cloud`.",
+      "id": "compute",
+      "title": "Compute"
+    },
+    {
+      "description": "Defaults for SLURM targets; per-cluster details live in site profiles.",
+      "id": "slurm",
+      "title": "SLURM"
+    },
+    {
+      "description": "Where connector plugins are installed from (an internal index or a wheel directory when air-gapped).",
+      "id": "plugins",
+      "title": "Plugins"
+    },
+    {
+      "description": "Proxy, certificate authority and offline mode for every outbound connection.",
+      "id": "network",
+      "title": "Network"
+    },
+    {
+      "description": "Which secret store holds credentials. Credentials themselves are never settings.",
+      "id": "secrets",
+      "title": "Secrets"
+    },
+    {
+      "description": "Log verbosity and format. Frontier sends no usage telemetry.",
+      "id": "logging",
+      "title": "Logging and telemetry"
+    },
+    {
+      "description": "Presentation preferences of the app and the TUI.",
+      "id": "ui",
+      "title": "Interface"
+    },
+    {
+      "description": "How the 3D and 2D views of the app respond to the mouse.",
+      "id": "viewer",
+      "title": "Viewer"
+    },
+    {
+      "description": "How the editor in board nodes and on pages looks and types.",
+      "id": "editor",
+      "title": "Editor"
+    },
+    {
+      "description": "Which events the app tells you about, and where and how long its toasts show.",
+      "id": "notifications",
+      "title": "Notifications"
+    },
+    {
+      "description": "The control plane process (`frontier-server`).",
+      "id": "server",
+      "title": "Server"
+    },
+    {
+      "description": "Who may call the control plane: single-user, API tokens or OIDC sign-in; sessions and the audit log.",
+      "id": "auth",
+      "title": "Authentication"
+    },
+    {
+      "description": "The worker process (`frontier-worker`) on a compute node.",
+      "id": "worker",
+      "title": "Worker"
+    },
+    {
+      "description": "Size limits enforced by the control plane.",
+      "id": "limits",
+      "title": "Limits"
+    },
+    {
+      "description": "Organisation policy. Meant to be set and locked in the system file by an administrator.",
+      "id": "policy",
+      "title": "Policy"
+    }
+  ],
+  "settings": [
+    {
+      "default": "",
+      "description": "Base URL of the Frontier server (for example https://frontier.example.com). Empty means offline: runs are recorded locally and synced later.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_CLIENT__SERVER_URL",
+        "FRONTIER_SERVER"
+      ],
+      "key": "client.server_url",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Connection",
+      "since": "0.2",
+      "title": "Control plane URL",
+      "type": "url"
+    },
+    {
+      "default": ".frontier",
+      "description": "Where the SDK writes run records when no server is reachable. Relative paths are relative to the working directory.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_CLIENT__OFFLINE_DIR",
+        "FRONTIER_DIR"
+      ],
+      "key": "client.offline_dir",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "project",
+      "secret": false,
+      "section": "Connection",
+      "since": "0.2",
+      "title": "Offline run directory",
+      "type": "path"
+    },
+    {
+      "default": 30,
+      "description": "Timeout of one request to the control plane.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_CLIENT__REQUEST_TIMEOUT_SECS"
+      ],
+      "key": "client.request_timeout_secs",
+      "max": 3600.0,
+      "min": 1.0,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Connection",
+      "since": "0.2",
+      "title": "Request timeout (seconds)",
+      "type": "int"
+    },
+    {
+      "default": "~/frontier/datasets",
+      "description": "Where converted frontier-datasets go. On a server, when set: cases converted on the Connectors page (`<dir>/converted/<name>`) and hub pulls (`<dir>/hub/<id>`) are written here instead of the server's data directory.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_STORAGE__DATASETS_DIR",
+        "FRONTIER_DATASETS_DIR"
+      ],
+      "key": "storage.datasets_dir",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Storage",
+      "since": "0.2",
+      "title": "Datasets directory",
+      "type": "path"
+    },
+    {
+      "default": "datasets/raw",
+      "description": "Where `frontier hub pull` stores files as published, one sub-directory per dataset. Relative paths are relative to the working directory.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_STORAGE__RAW_DIR",
+        "FRONTIER_RAW_DIR"
+      ],
+      "key": "storage.raw_dir",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Storage",
+      "since": "0.2",
+      "title": "Raw downloads directory",
+      "type": "path"
+    },
+    {
+      "default": "~/.cache/frontier",
+      "description": "Downloads that can be fetched again (cloud-solver results, plugin wheels).",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_STORAGE__CACHE_DIR",
+        "FRONTIER_CONNECTORS_CACHE"
+      ],
+      "key": "storage.cache_dir",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Storage",
+      "since": "0.2",
+      "title": "Cache directory",
+      "type": "path"
+    },
+    {
+      "default": "runs",
+      "description": "Where local runs write checkpoints, logs and reports. Relative paths are relative to the working directory.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_STORAGE__RUNS_DIR"
+      ],
+      "key": "storage.runs_dir",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "project",
+      "secret": false,
+      "section": "Storage",
+      "since": "0.2",
+      "title": "Run output directory",
+      "type": "path"
+    },
+    {
+      "default": [],
+      "description": "Directories under which a request may name a path for the server to read or write (registering a dataset, trying a connector, a hub pull target). The data directory and `storage.datasets_dir` always count. Empty: no further restriction in single-user mode; with authentication on, only those two.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_STORAGE__IMPORT_ROOTS"
+      ],
+      "key": "storage.import_roots",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Storage",
+      "since": "0.2",
+      "title": "Directories the server may read on request",
+      "type": "list"
+    },
+    {
+      "default": 2147483648,
+      "description": "Largest pull that starts without --yes or an explicit --max-bytes.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_HUB__MAX_BYTES"
+      ],
+      "key": "hub.max_bytes",
+      "max": null,
+      "min": 1.0,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Datasets hub",
+      "since": "0.2",
+      "title": "Download size limit",
+      "type": "bytes"
+    },
+    {
+      "default": "",
+      "description": "Replaces the built-in hub catalogue (a catalog.json exported by `frontier hub export`). Empty uses the built-in one.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_HUB__CATALOG_PATH",
+        "FRONTIER_HUB_CATALOG"
+      ],
+      "key": "hub.catalog_path",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Datasets hub",
+      "since": "0.2",
+      "title": "Catalogue file",
+      "type": "path"
+    },
+    {
+      "default": [],
+      "description": "Directories or files with more catalogue entries (an organisation's internal datasets).",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_HUB__EXTRA_CATALOGS",
+        "FRONTIER_HUB_CATALOGS"
+      ],
+      "key": "hub.extra_catalogs",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Datasets hub",
+      "since": "0.2",
+      "title": "Additional catalogues",
+      "type": "list"
+    },
+    {
+      "default": [],
+      "description": "Where your organisation keeps raw files of hub entries: items `<entry id or pattern>=<location>`, first match wins, for example `shift-*=s3://company-datasets/restricted` and `*=/mnt/datasets/hub`. A location is a directory or an object-store prefix (s3://, r2://, gs://, az://). Credentials for it come from the secret store (providers `s3`, `gcs`, `azure`), never from the location.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_HUB__MIRRORS"
+      ],
+      "key": "hub.mirrors",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Datasets hub",
+      "since": "0.2",
+      "title": "Organisation mirrors",
+      "type": "list"
+    },
+    {
+      "default": "",
+      "description": "Base URL of a Hugging Face mirror (HF_ENDPOINT). Empty uses https://huggingface.co.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_HUB__HUGGINGFACE_ENDPOINT",
+        "HF_ENDPOINT"
+      ],
+      "key": "hub.huggingface_endpoint",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Datasets hub",
+      "since": "0.2",
+      "title": "Hugging Face endpoint",
+      "type": "url"
+    },
+    {
+      "default": "local",
+      "description": "Where `frontier run` sends a run when --on is not given.",
+      "editable_by": "user",
+      "enum": [
+        "local",
+        "ssh",
+        "slurm",
+        "k8s",
+        "runpod",
+        "anyscale"
+      ],
+      "env": [
+        "FRONTIER_COMPUTE__DEFAULT_TARGET"
+      ],
+      "key": "compute.default_target",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Default target",
+      "type": "string"
+    },
+    {
+      "default": "runpod",
+      "description": "Provider used by `frontier cloud up` and `frontier cloud offers` when --provider is not given.",
+      "editable_by": "user",
+      "enum": [
+        "runpod",
+        "anyscale",
+        "local",
+        "slurm"
+      ],
+      "env": [
+        "FRONTIER_COMPUTE__DEFAULT_PROVIDER"
+      ],
+      "key": "compute.default_provider",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Default cloud provider",
+      "type": "string"
+    },
+    {
+      "default": "NVIDIA GeForce RTX 4090",
+      "description": "GPU type `frontier cloud up` rents when --gpu is not given.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_COMPUTE__DEFAULT_GPU"
+      ],
+      "key": "compute.default_gpu",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Default GPU type",
+      "type": "string"
+    },
+    {
+      "default": "secure",
+      "description": "RunPod capacity tier: `secure` (datacentre) or `community` (cheaper, interruptible hosts).",
+      "editable_by": "user",
+      "enum": [
+        "secure",
+        "community"
+      ],
+      "env": [
+        "FRONTIER_COMPUTE__DEFAULT_TIER"
+      ],
+      "key": "compute.default_tier",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Default cloud tier",
+      "type": "string"
+    },
+    {
+      "default": 0.0,
+      "description": "A cloud run is stopped when its accumulated cost reaches this amount, unless --max-cost says otherwise. 0 means no ceiling of your own; `policy.max_cost_per_run` caps it organisation-wide.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_COMPUTE__MAX_COST_PER_RUN"
+      ],
+      "key": "compute.max_cost_per_run",
+      "max": null,
+      "min": 0.0,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Cost ceiling per run (USD)",
+      "type": "float"
+    },
+    {
+      "default": "docker.io/michaltakac",
+      "description": "Registry and path the Frontier images are pulled from. The training image is `<registry>/frontier-trainer:<version>` and the server and worker image `<registry>/frontier:<version>`.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_COMPUTE__REGISTRY",
+        "FRONTIER_REGISTRY"
+      ],
+      "key": "compute.registry",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Container registry",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Container image a run uses on cloud, SLURM and Kubernetes targets. Empty uses `<compute.registry>/frontier-trainer:<version>`.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_COMPUTE__IMAGE",
+        "FRONTIER_IMAGE"
+      ],
+      "key": "compute.image",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Training image",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Container image `frontier cloud up` starts on a rented instance. Empty uses `<compute.registry>/frontier:<version>`.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_COMPUTE__WORKER_IMAGE"
+      ],
+      "key": "compute.worker_image",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Worker image",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Python interpreter (or command prefix) that has the Frontier Python packages. Empty uses `.venv` in the project directory, then `uv run python`.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_COMPUTE__PYTHON",
+        "FRONTIER_PYTHON"
+      ],
+      "key": "compute.python",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Python interpreter",
+      "type": "string"
+    },
+    {
+      "default": {},
+      "description": "Named sets of devices with a role mask, `[compute.pools.<name>]` with `nodes`, `gpus`, `roles` (training, inference, rendering, prep, any), `quota` (`{gpus, jobs}`), `priority`, `shared` and `description`. Every device not named by a pool belongs to the built-in `auto` pool with all roles.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_COMPUTE__POOLS"
+      ],
+      "key": "compute.pools",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Compute pools",
+      "type": "table"
+    },
+    {
+      "default": "",
+      "description": "Pool the control plane's render workers (thumbnails, render-to-image, frame preparation) take their device from. Empty = any pool that serves the `rendering` role, `auto` included.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_COMPUTE__RENDERING_POOL"
+      ],
+      "key": "compute.rendering_pool",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Rendering pool",
+      "type": "string"
+    },
+    {
+      "default": "topology",
+      "description": "How devices are picked for a job inside a pool: `topology` (same node first, NVLink islands for multi-GPU jobs, then least loaded), `least_loaded` (lowest utilisation and memory use first) or `memory_fit` (the smallest device that fits the request).",
+      "editable_by": "admin",
+      "enum": [
+        "topology",
+        "least_loaded",
+        "memory_fit"
+      ],
+      "env": [
+        "FRONTIER_COMPUTE__ALLOCATION_POLICY"
+      ],
+      "key": "compute.allocation_policy",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Allocation policy",
+      "type": "string"
+    },
+    {
+      "default": true,
+      "description": "Start a `frontier-worker` for the `local` backend next to the control plane, so a single-machine install runs jobs without starting a worker by hand. Turn it off on shared servers where workers run on other machines.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_COMPUTE__LOCAL_EXECUTOR"
+      ],
+      "key": "compute.local_executor",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Built-in local worker",
+      "type": "bool"
+    },
+    {
+      "default": 2,
+      "description": "How many jobs the built-in local worker runs at the same time. Two lets an inference predict while a model trains on the same machine; 1 runs them one after the other.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_COMPUTE__LOCAL_WORKER_JOBS"
+      ],
+      "key": "compute.local_worker_jobs",
+      "max": null,
+      "min": 1.0,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Jobs of the built-in worker",
+      "type": "int"
+    },
+    {
+      "default": 20,
+      "description": "How many predictions made by an automatic rule (a new checkpoint, a schedule) are kept for one Inference node; older ones are removed with their files. Predictions a person asked for are never removed. 0 keeps all.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SERVER__INFERENCE_KEEP_PER_NODE"
+      ],
+      "key": "server.inference_keep_per_node",
+      "max": null,
+      "min": 0.0,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Server",
+      "since": "0.2",
+      "title": "Automatic predictions kept per node",
+      "type": "int"
+    },
+    {
+      "default": 1,
+      "description": "How many requests the runtime of a served board answers at the same time; the rest wait. A service can set its own.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SERVER__SERVICE_WARM"
+      ],
+      "key": "server.service_warm",
+      "max": null,
+      "min": 1.0,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Server",
+      "since": "0.2",
+      "title": "Requests a service answers at once",
+      "type": "int"
+    },
+    {
+      "default": 0,
+      "description": "A running service that took no request for this long is stopped and its worker released; the next call starts it again and waits for it. 0 keeps services running.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SERVER__SERVICE_IDLE_RELEASE_MIN"
+      ],
+      "key": "server.service_idle_release_min",
+      "max": null,
+      "min": 0.0,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Server",
+      "since": "0.2",
+      "title": "Release an idle service after (minutes)",
+      "type": "int"
+    },
+    {
+      "default": 600,
+      "description": "At most this many calls per minute to one service; more are refused with 429. A service can set its own.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SERVER__SERVICE_RATE_PER_MIN"
+      ],
+      "key": "server.service_rate_per_min",
+      "max": null,
+      "min": 0.0,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Server",
+      "since": "0.2",
+      "title": "Requests per minute per service",
+      "type": "int"
+    },
+    {
+      "default": 64,
+      "description": "A call with a larger body is refused with 413. A service can set its own.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SERVER__SERVICE_MAX_REQUEST_MB"
+      ],
+      "key": "server.service_max_request_mb",
+      "max": 4096.0,
+      "min": 1.0,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Server",
+      "since": "0.2",
+      "title": "Largest request to a service (MB)",
+      "type": "int"
+    },
+    {
+      "default": 90,
+      "description": "An allocation is released when no heartbeat from its worker renews it for this long, and its job is marked failed (`worker lost`).",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_COMPUTE__LEASE_SECS"
+      ],
+      "key": "compute.lease_secs",
+      "max": 3600.0,
+      "min": 15.0,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Compute",
+      "since": "0.2",
+      "title": "Allocation lease (seconds)",
+      "type": "int"
+    },
+    {
+      "default": "",
+      "description": "Site profile (a file in the `sites` directory of the Frontier home) used by --on slurm / --on ssh when neither --site nor --host is given.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_SLURM__DEFAULT_SITE"
+      ],
+      "key": "slurm.default_site",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "SLURM",
+      "since": "0.2",
+      "title": "Default site profile",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Partition for generated batch scripts when the site profile does not set one.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_SLURM__PARTITION",
+        "SLURM_PARTITION"
+      ],
+      "key": "slurm.partition",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "SLURM",
+      "since": "0.2",
+      "title": "Partition",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Accounting project for generated batch scripts when the site profile does not set one.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_SLURM__ACCOUNT",
+        "SLURM_ACCOUNT"
+      ],
+      "key": "slurm.account",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "SLURM",
+      "since": "0.2",
+      "title": "Account",
+      "type": "string"
+    },
+    {
+      "default": "08:00:00",
+      "description": "Wall-clock limit (HH:MM:SS) of a generated worker allocation.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_SLURM__TIME_LIMIT",
+        "SLURM_TIME"
+      ],
+      "key": "slurm.time_limit",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "SLURM",
+      "since": "0.2",
+      "title": "Time limit",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Python package index plugins are installed from. Empty uses the installer's default (PyPI). Set it to an internal mirror in restricted networks.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_PLUGINS__INDEX_URL",
+        "FRONTIER_PLUGIN_INDEX"
+      ],
+      "key": "plugins.index_url",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Plugins",
+      "since": "0.2",
+      "title": "Package index",
+      "type": "url"
+    },
+    {
+      "default": "",
+      "description": "Directory of plugin wheels to install from instead of an index (air-gapped installations). When set, no index is contacted.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_PLUGINS__WHEEL_DIR",
+        "FRONTIER_PLUGIN_WHEELS"
+      ],
+      "key": "plugins.wheel_dir",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Plugins",
+      "since": "0.2",
+      "title": "Wheel directory",
+      "type": "path"
+    },
+    {
+      "default": "auto",
+      "description": "Tool that installs plugin wheels: uv when available, else pip.",
+      "editable_by": "user",
+      "enum": [
+        "auto",
+        "uv",
+        "pip"
+      ],
+      "env": [
+        "FRONTIER_PLUGINS__INSTALLER",
+        "FRONTIER_PLUGIN_INSTALLER"
+      ],
+      "key": "plugins.installer",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Plugins",
+      "since": "0.2",
+      "title": "Installer",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Proxy for outbound HTTPS (exported to child processes as HTTPS_PROXY).",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_NETWORK__HTTPS_PROXY",
+        "HTTPS_PROXY",
+        "https_proxy"
+      ],
+      "key": "network.https_proxy",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Network",
+      "since": "0.2",
+      "title": "HTTPS proxy",
+      "type": "url"
+    },
+    {
+      "default": "",
+      "description": "Proxy for outbound HTTP (exported as HTTP_PROXY).",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_NETWORK__HTTP_PROXY",
+        "HTTP_PROXY",
+        "http_proxy"
+      ],
+      "key": "network.http_proxy",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Network",
+      "since": "0.2",
+      "title": "HTTP proxy",
+      "type": "url"
+    },
+    {
+      "default": [],
+      "description": "Hosts and domains reached directly (exported as NO_PROXY).",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_NETWORK__NO_PROXY",
+        "NO_PROXY",
+        "no_proxy"
+      ],
+      "key": "network.no_proxy",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Network",
+      "since": "0.2",
+      "title": "Proxy exceptions",
+      "type": "list"
+    },
+    {
+      "default": "",
+      "description": "PEM file with the certificate authorities to trust, for TLS-inspecting proxies and internal services (exported as SSL_CERT_FILE, REQUESTS_CA_BUNDLE and CURL_CA_BUNDLE).",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_NETWORK__CA_BUNDLE",
+        "SSL_CERT_FILE",
+        "REQUESTS_CA_BUNDLE"
+      ],
+      "key": "network.ca_bundle",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Network",
+      "since": "0.2",
+      "title": "CA bundle",
+      "type": "path"
+    },
+    {
+      "default": false,
+      "description": "Never open a connection to the public internet: hub pulls, plugin index lookups, price lists and update checks fail fast with an explanation instead of timing out.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_NETWORK__OFFLINE",
+        "FRONTIER_OFFLINE"
+      ],
+      "key": "network.offline",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Network",
+      "since": "0.2",
+      "title": "Offline mode",
+      "type": "bool"
+    },
+    {
+      "default": [],
+      "description": "Host names inside your network that stay reachable with `network.offline` on, besides this machine, private address ranges and the control plane (`client.server_url`): a secret manager, an identity provider, an internal package index.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_NETWORK__OFFLINE_ALLOW_HOSTS"
+      ],
+      "key": "network.offline_allow_hosts",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Network",
+      "since": "0.2",
+      "title": "Hosts reachable in offline mode",
+      "type": "list"
+    },
+    {
+      "default": "auto",
+      "description": "Where credentials are kept on this machine: the OS keychain, a 0600 file (`credentials.toml` in the state directory, for headless nodes), the environment only, or your organisation's secret manager: `vault` (HashiCorp Vault KV v2, `secrets.vault.*`), `aws` (AWS Secrets Manager, `secrets.aws.*`), `azure` (Azure Key Vault, `secrets.azure.*`) or `gcp` (Google Secret Manager, `secrets.gcp.*`). `auto` uses the keychain when one is available, else the file.",
+      "editable_by": "user",
+      "enum": [
+        "auto",
+        "keychain",
+        "file",
+        "env",
+        "vault",
+        "aws",
+        "azure",
+        "gcp"
+      ],
+      "env": [
+        "FRONTIER_SECRETS__BACKEND"
+      ],
+      "key": "secrets.backend",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Secret store",
+      "type": "string"
+    },
+    {
+      "default": "db",
+      "description": "Where the control plane keeps the credentials people store on it: `db` (its own database, each value encrypted with the server key), `vault` (HashiCorp Vault, `secrets.vault.*`) or `aws` (AWS Secrets Manager, `secrets.aws.*`). New and changed credentials go to this store; `POST /api/v1/secrets/backend/migrate` moves the existing ones.",
+      "editable_by": "admin",
+      "enum": [
+        "db",
+        "vault",
+        "aws",
+        "azure",
+        "gcp"
+      ],
+      "env": [
+        "FRONTIER_SECRETS__SERVER_BACKEND"
+      ],
+      "key": "secrets.server_backend",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Control plane credential store",
+      "type": "string"
+    },
+    {
+      "default": "file",
+      "description": "How the key that encrypts the `db` credential store is kept: `file` (the key itself in `secrets.key_file`, or `FRONTIER_SECRET_KEY`) or `aws-kms` (envelope encryption: the file holds a data key wrapped by the KMS key `secrets.aws.kms_key_id`, unwrapped at start-up).",
+      "editable_by": "admin",
+      "enum": [
+        "file",
+        "aws-kms"
+      ],
+      "env": [
+        "FRONTIER_SECRETS__SERVER_KEY"
+      ],
+      "key": "secrets.server_key",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Control plane key protection",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Address of the HashiCorp Vault server, for example https://vault.example.com:8200.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__VAULT_ADDR",
+        "VAULT_ADDR"
+      ],
+      "key": "secrets.vault.addr",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Vault address",
+      "type": "url"
+    },
+    {
+      "default": "secret",
+      "description": "Mount point of the KV version 2 secrets engine.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__VAULT_MOUNT"
+      ],
+      "key": "secrets.vault.mount",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Vault KV mount",
+      "type": "string"
+    },
+    {
+      "default": "frontier",
+      "description": "Path under the mount; one secret per credential provider is kept at `<prefix>/<provider>`, with one key per field.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__VAULT_PREFIX"
+      ],
+      "key": "secrets.vault.prefix",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Vault path prefix",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Vault Enterprise / HCP namespace; empty for none.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__VAULT_NAMESPACE",
+        "VAULT_NAMESPACE"
+      ],
+      "key": "secrets.vault.namespace",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Vault namespace",
+      "type": "string"
+    },
+    {
+      "default": "token",
+      "description": "`token` (from `VAULT_TOKEN` or the credential file), `approle` (role id in `secrets.vault.role`, secret id from `FRONTIER_VAULT_SECRET_ID` or the credential file) or `kubernetes` (the pod's service-account token; role in `secrets.vault.role`).",
+      "editable_by": "admin",
+      "enum": [
+        "token",
+        "approle",
+        "kubernetes"
+      ],
+      "env": [
+        "FRONTIER_SECRETS__VAULT_AUTH"
+      ],
+      "key": "secrets.vault.auth",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Vault authentication",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "AppRole role id, or the role name of the Kubernetes auth method.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__VAULT_ROLE"
+      ],
+      "key": "secrets.vault.role",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Vault role",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Mount point of the auth method when it is not the default (`approle`, `kubernetes`).",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__VAULT_AUTH_MOUNT"
+      ],
+      "key": "secrets.vault.auth_mount",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Vault auth mount",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "File holding the Vault token or the AppRole secret id (or, for `kubernetes`, the service-account token when it is not at the standard path). Never put the value itself in a setting.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__VAULT_CREDENTIAL_FILE"
+      ],
+      "key": "secrets.vault.credential_file",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Vault credential file",
+      "type": "path"
+    },
+    {
+      "default": "",
+      "description": "Address of the key vault, for example https://frontier-prod.vault.azure.net.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__AZURE_VAULT_URL"
+      ],
+      "key": "secrets.azure.vault_url",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Azure Key Vault URL",
+      "type": "url"
+    },
+    {
+      "default": "frontier",
+      "description": "One secret per credential provider is kept as `<prefix>-<provider>` (Key Vault names allow letters, digits and dashes), a JSON object with one key per field.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__AZURE_PREFIX"
+      ],
+      "key": "secrets.azure.prefix",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Azure secret name prefix",
+      "type": "string"
+    },
+    {
+      "default": "managed_identity",
+      "description": "`managed_identity` (the identity of the VM, container or AKS pod) or `client_secret` (an app registration: `secrets.azure.tenant_id`, `secrets.azure.client_id`, and the secret from `AZURE_CLIENT_SECRET` or `secrets.azure.credential_file`).",
+      "editable_by": "admin",
+      "enum": [
+        "managed_identity",
+        "client_secret"
+      ],
+      "env": [
+        "FRONTIER_SECRETS__AZURE_AUTH"
+      ],
+      "key": "secrets.azure.auth",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Azure authentication",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Directory (tenant) id for `client_secret` authentication; empty uses `AZURE_TENANT_ID`.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__AZURE_TENANT_ID"
+      ],
+      "key": "secrets.azure.tenant_id",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Azure tenant",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Application (client) id for `client_secret` authentication, or the client id of a user-assigned managed identity; empty uses `AZURE_CLIENT_ID`.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__AZURE_CLIENT_ID"
+      ],
+      "key": "secrets.azure.client_id",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Azure client id",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "File holding the client secret. Never put the value itself in a setting.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__AZURE_CREDENTIAL_FILE"
+      ],
+      "key": "secrets.azure.credential_file",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Azure credential file",
+      "type": "path"
+    },
+    {
+      "default": "",
+      "description": "Token endpoint host when it is not https://login.microsoftonline.com (sovereign clouds, or an emulator in tests).",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__AZURE_AUTHORITY"
+      ],
+      "key": "secrets.azure.authority",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Azure authority override",
+      "type": "url"
+    },
+    {
+      "default": "",
+      "description": "Project id that holds the secrets; empty uses `GOOGLE_CLOUD_PROJECT`.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__GCP_PROJECT"
+      ],
+      "key": "secrets.gcp.project",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Google Cloud project",
+      "type": "string"
+    },
+    {
+      "default": "frontier",
+      "description": "One secret per credential provider is kept as `<prefix>-<provider>`, a JSON object with one key per field.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__GCP_PREFIX"
+      ],
+      "key": "secrets.gcp.prefix",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Google secret id prefix",
+      "type": "string"
+    },
+    {
+      "default": "metadata",
+      "description": "`metadata` (the service account of the VM, Cloud Run service or GKE workload identity) or `service_account` (a key file: `secrets.gcp.credential_file`, or `GOOGLE_APPLICATION_CREDENTIALS`).",
+      "editable_by": "admin",
+      "enum": [
+        "metadata",
+        "service_account"
+      ],
+      "env": [
+        "FRONTIER_SECRETS__GCP_AUTH"
+      ],
+      "key": "secrets.gcp.auth",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Google authentication",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "JSON key file of the service account for `service_account` authentication.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__GCP_CREDENTIAL_FILE"
+      ],
+      "key": "secrets.gcp.credential_file",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Google service-account key file",
+      "type": "path"
+    },
+    {
+      "default": "",
+      "description": "Endpoint when it is not https://secretmanager.googleapis.com (Private Service Connect, or an emulator in tests).",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__GCP_ENDPOINT"
+      ],
+      "key": "secrets.gcp.endpoint",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Google Secret Manager endpoint override",
+      "type": "url"
+    },
+    {
+      "default": "",
+      "description": "Region of AWS Secrets Manager; empty uses `AWS_REGION`. Credentials come from `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` (/ `AWS_SESSION_TOKEN`) in the environment.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__AWS_REGION"
+      ],
+      "key": "secrets.aws.region",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "AWS region",
+      "type": "string"
+    },
+    {
+      "default": "frontier",
+      "description": "One secret per credential provider is kept as `<prefix>/<provider>`, a JSON object with one key per field.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__AWS_PREFIX"
+      ],
+      "key": "secrets.aws.prefix",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "AWS secret name prefix",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "KMS key id, ARN or alias that new secrets are encrypted under; empty uses the account's default key for Secrets Manager.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__AWS_KMS_KEY_ID"
+      ],
+      "key": "secrets.aws.kms_key_id",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "AWS KMS key",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Endpoint of KMS when it is not the public one: a VPC endpoint, or an emulator in tests.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__AWS_KMS_ENDPOINT"
+      ],
+      "key": "secrets.aws.kms_endpoint",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "AWS KMS endpoint override",
+      "type": "url"
+    },
+    {
+      "default": "",
+      "description": "Endpoint of Secrets Manager when it is not the public one: a VPC endpoint, or an emulator in tests.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__AWS_ENDPOINT"
+      ],
+      "key": "secrets.aws.endpoint",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "AWS endpoint override",
+      "type": "url"
+    },
+    {
+      "default": "",
+      "description": "File with the 32-byte key (hex or base64) that encrypts credentials stored by the server. FRONTIER_SECRET_KEY takes precedence. Empty uses `secret.key` in the server data directory, created on first start.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SECRETS__KEY_FILE"
+      ],
+      "key": "secrets.key_file",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Secrets",
+      "since": "0.2",
+      "title": "Server encryption key file",
+      "type": "path"
+    },
+    {
+      "default": "info",
+      "description": "Verbosity of every Frontier process. RUST_LOG, when set, still wins for the Rust binaries.",
+      "editable_by": "user",
+      "enum": [
+        "error",
+        "warn",
+        "info",
+        "debug",
+        "trace"
+      ],
+      "env": [
+        "FRONTIER_LOGGING__LEVEL",
+        "FRONTIER_LOG"
+      ],
+      "key": "logging.level",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Logging and telemetry",
+      "since": "0.2",
+      "title": "Log level",
+      "type": "string"
+    },
+    {
+      "default": "text",
+      "description": "`json` writes one JSON object per line for log collectors.",
+      "editable_by": "user",
+      "enum": [
+        "text",
+        "json"
+      ],
+      "env": [
+        "FRONTIER_LOGGING__FORMAT"
+      ],
+      "key": "logging.format",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Logging and telemetry",
+      "since": "0.2",
+      "title": "Log format",
+      "type": "string"
+    },
+    {
+      "default": "system",
+      "description": "Colour theme of the app and the TUI.",
+      "editable_by": "user",
+      "enum": [
+        "system",
+        "light",
+        "dark"
+      ],
+      "env": [
+        "FRONTIER_UI__THEME"
+      ],
+      "key": "ui.theme",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Interface",
+      "since": "0.2",
+      "title": "Theme",
+      "type": "string"
+    },
+    {
+      "default": "si",
+      "description": "Unit system used when displaying physical quantities.",
+      "editable_by": "user",
+      "enum": [
+        "si",
+        "imperial"
+      ],
+      "env": [
+        "FRONTIER_UI__UNITS"
+      ],
+      "key": "ui.units",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Interface",
+      "since": "0.2",
+      "title": "Units",
+      "type": "string"
+    },
+    {
+      "default": "viridis",
+      "description": "Colour map applied to a scalar field when none was chosen.",
+      "editable_by": "user",
+      "enum": [
+        "viridis",
+        "plasma",
+        "inferno",
+        "magma",
+        "cividis",
+        "turbo",
+        "coolwarm",
+        "grayscale"
+      ],
+      "env": [
+        "FRONTIER_UI__COLORMAP"
+      ],
+      "key": "ui.colormap",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Interface",
+      "since": "0.2",
+      "title": "Default colour map",
+      "type": "string"
+    },
+    {
+      "default": 1000,
+      "description": "How often the TUI and live views poll for new data.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_UI__REFRESH_MS"
+      ],
+      "key": "ui.refresh_ms",
+      "max": 60000.0,
+      "min": 100.0,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Interface",
+      "since": "0.2",
+      "title": "Refresh interval (ms)",
+      "type": "int"
+    },
+    {
+      "default": "follow",
+      "description": "`follow`: the object follows the hand when you drag, and rolling the wheel away from you zooms in, as in ParaView. `camera`: drags move the camera instead. `custom`: the three switches below.",
+      "editable_by": "user",
+      "enum": [
+        "follow",
+        "camera",
+        "custom"
+      ],
+      "env": [
+        "FRONTIER_VIEWER__NAVIGATION"
+      ],
+      "key": "viewer.navigation",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Viewer",
+      "since": "0.2",
+      "title": "Navigation style",
+      "type": "string"
+    },
+    {
+      "default": false,
+      "description": "With navigation style `custom`: a drag to the left turns the object to the right.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_VIEWER__INVERT_ORBIT_X"
+      ],
+      "key": "viewer.invert_orbit_x",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Viewer",
+      "since": "0.2",
+      "title": "Invert horizontal orbit",
+      "type": "bool"
+    },
+    {
+      "default": false,
+      "description": "With navigation style `custom`: a drag down turns the object up.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_VIEWER__INVERT_ORBIT_Y"
+      ],
+      "key": "viewer.invert_orbit_y",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Viewer",
+      "since": "0.2",
+      "title": "Invert vertical orbit",
+      "type": "bool"
+    },
+    {
+      "default": false,
+      "description": "With navigation style `custom`: rolling the wheel away from you zooms out.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_VIEWER__INVERT_ZOOM"
+      ],
+      "key": "viewer.invert_zoom",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Viewer",
+      "since": "0.2",
+      "title": "Invert zoom",
+      "type": "bool"
+    },
+    {
+      "default": "crosshair",
+      "description": "Pointer shown over a 3D or 2D view while it reads the value under it. Dragging always shows the grabbing hand.",
+      "editable_by": "user",
+      "enum": [
+        "crosshair",
+        "arrow",
+        "cell",
+        "hand"
+      ],
+      "env": [
+        "FRONTIER_VIEWER__PROBE_CURSOR"
+      ],
+      "key": "viewer.probe_cursor",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Viewer",
+      "since": "0.2",
+      "title": "Probe cursor",
+      "type": "string"
+    },
+    {
+      "default": "follow",
+      "description": "`follow`: light or dark with the app. `light` or `dark`: always that one.",
+      "editable_by": "user",
+      "enum": [
+        "follow",
+        "light",
+        "dark"
+      ],
+      "env": [
+        "FRONTIER_EDITOR__THEME"
+      ],
+      "key": "editor.theme",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Editor theme",
+      "type": "string"
+    },
+    {
+      "default": "default",
+      "description": "`default`: the app's palette. `vivid`: stronger colours. `quiet`: keys and strings only; everything else in the text colour.",
+      "editable_by": "user",
+      "enum": [
+        "default",
+        "vivid",
+        "quiet"
+      ],
+      "env": [
+        "FRONTIER_EDITOR__SYNTAX"
+      ],
+      "key": "editor.syntax",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Syntax colours",
+      "type": "string"
+    },
+    {
+      "default": 13,
+      "description": "Size of the editor's text at 100% zoom.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_EDITOR__FONT_SIZE"
+      ],
+      "key": "editor.font_size",
+      "max": 28.0,
+      "min": 9.0,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Font size (px)",
+      "type": "int"
+    },
+    {
+      "default": 1.45,
+      "description": "Height of a row as a multiple of the font size.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_EDITOR__LINE_HEIGHT"
+      ],
+      "key": "editor.line_height",
+      "max": 2.2,
+      "min": 1.1,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Line height",
+      "type": "float"
+    },
+    {
+      "default": 2,
+      "description": "Cells a tab stop spans, and spaces one press of Tab inserts.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_EDITOR__TAB_SIZE"
+      ],
+      "key": "editor.tab_size",
+      "max": 8.0,
+      "min": 1.0,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Tab size",
+      "type": "int"
+    },
+    {
+      "default": true,
+      "description": "Tab inserts spaces up to the next tab stop. Off: a tab character.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_EDITOR__INSERT_SPACES"
+      ],
+      "key": "editor.insert_spaces",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Indent with spaces",
+      "type": "bool"
+    },
+    {
+      "default": true,
+      "description": "Long lines continue on the next row instead of scrolling sideways. A node's own Wrap lines setting wins.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_EDITOR__WRAP"
+      ],
+      "key": "editor.wrap",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Wrap lines",
+      "type": "bool"
+    },
+    {
+      "default": true,
+      "description": "Show the number of each line beside it.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_EDITOR__LINE_NUMBERS"
+      ],
+      "key": "editor.line_numbers",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Line numbers",
+      "type": "bool"
+    },
+    {
+      "default": true,
+      "description": "An outline of the whole file beside the scrollbar, when the editor is wide enough for it.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_EDITOR__MINIMAP"
+      ],
+      "key": "editor.minimap",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Minimap",
+      "type": "bool"
+    },
+    {
+      "default": true,
+      "description": "Tint the row the caret is on.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_EDITOR__CURRENT_LINE"
+      ],
+      "key": "editor.current_line",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Highlight the current line",
+      "type": "bool"
+    },
+    {
+      "default": "bar",
+      "description": "Shape of the caret.",
+      "editable_by": "user",
+      "enum": [
+        "bar",
+        "block",
+        "underline"
+      ],
+      "env": [
+        "FRONTIER_EDITOR__CURSOR_STYLE"
+      ],
+      "key": "editor.cursor_style",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Cursor",
+      "type": "string"
+    },
+    {
+      "default": true,
+      "description": "Off: the caret is always shown.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_EDITOR__CURSOR_BLINK"
+      ],
+      "key": "editor.cursor_blink",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Blinking cursor",
+      "type": "bool"
+    },
+    {
+      "default": true,
+      "description": "Typing an opening bracket or quote inserts its pair.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_EDITOR__AUTO_CLOSE"
+      ],
+      "key": "editor.auto_close",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Close brackets and quotes",
+      "type": "bool"
+    },
+    {
+      "default": false,
+      "description": "Saving a JSON, YAML or TOML file formats it first. Comments and values are kept; a file with a syntax error is saved as it is.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_EDITOR__FORMAT_ON_SAVE"
+      ],
+      "key": "editor.format_on_save",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Editor",
+      "since": "0.2",
+      "title": "Format on save",
+      "type": "bool"
+    },
+    {
+      "default": "top-right",
+      "description": "Corner of the window where toasts appear. They never cover the top bar or a board's toolbar.",
+      "editable_by": "user",
+      "enum": [
+        "top-right",
+        "top-left",
+        "bottom-right",
+        "bottom-left",
+        "top-centre"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__POSITION"
+      ],
+      "key": "notifications.position",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Toast position",
+      "type": "string"
+    },
+    {
+      "default": 6,
+      "description": "How long an information or success toast stays. Warnings and errors stay until dismissed.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_NOTIFICATIONS__DURATION_SECS"
+      ],
+      "key": "notifications.duration_secs",
+      "max": 60.0,
+      "min": 2.0,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Toast duration (s)",
+      "type": "int"
+    },
+    {
+      "default": 4,
+      "description": "More than this collapse into a count that opens the notification centre.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_NOTIFICATIONS__MAX_VISIBLE"
+      ],
+      "key": "notifications.max_visible",
+      "max": 8.0,
+      "min": 1.0,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Toasts shown at once",
+      "type": "int"
+    },
+    {
+      "default": false,
+      "description": "Play a short sound with a warning or an error toast.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_NOTIFICATIONS__SOUND"
+      ],
+      "key": "notifications.sound",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Sound",
+      "type": "bool"
+    },
+    {
+      "default": false,
+      "description": "Show no toasts; everything still arrives in the notification centre.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_NOTIFICATIONS__DO_NOT_DISTURB"
+      ],
+      "key": "notifications.do_not_disturb",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Do not disturb",
+      "type": "bool"
+    },
+    {
+      "default": "projects",
+      "description": "`mine`: only what you started. `projects`: everything in the projects you may read.",
+      "editable_by": "user",
+      "enum": [
+        "mine",
+        "projects"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__SCOPE"
+      ],
+      "key": "notifications.scope",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Whose events",
+      "type": "string"
+    },
+    {
+      "default": false,
+      "description": "Also show a notification of the operating system (the browser asks for permission) while the window is not in front.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_NOTIFICATIONS__OS"
+      ],
+      "key": "notifications.os",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "System notifications",
+      "type": "bool"
+    },
+    {
+      "default": "toast",
+      "description": "A pipeline run or a training run finished or failed. `toast`: a toast and an entry in the notification centre. `centre`: the entry only. `off`: nothing.",
+      "editable_by": "user",
+      "enum": [
+        "toast",
+        "centre",
+        "off"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__TYPES_RUNS"
+      ],
+      "key": "notifications.types.runs",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Runs",
+      "type": "string"
+    },
+    {
+      "default": "toast",
+      "description": "A step of a pipeline run failed. `toast`: a toast and an entry in the notification centre. `centre`: the entry only. `off`: nothing.",
+      "editable_by": "user",
+      "enum": [
+        "toast",
+        "centre",
+        "off"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__TYPES_STEPS"
+      ],
+      "key": "notifications.types.steps",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Pipeline steps",
+      "type": "string"
+    },
+    {
+      "default": "toast",
+      "description": "A job failed, or has been queued for a long time. `toast`: a toast and an entry in the notification centre. `centre`: the entry only. `off`: nothing.",
+      "editable_by": "user",
+      "enum": [
+        "toast",
+        "centre",
+        "off"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__TYPES_JOBS"
+      ],
+      "key": "notifications.types.jobs",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Jobs",
+      "type": "string"
+    },
+    {
+      "default": "toast",
+      "description": "A dataset import or a data-preparation step finished. `toast`: a toast and an entry in the notification centre. `centre`: the entry only. `off`: nothing.",
+      "editable_by": "user",
+      "enum": [
+        "toast",
+        "centre",
+        "off"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__TYPES_DATASETS"
+      ],
+      "key": "notifications.types.datasets",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Datasets",
+      "type": "string"
+    },
+    {
+      "default": "toast",
+      "description": "An evaluation finished, a report is ready, or a quality gate refused a model. `toast`: a toast and an entry in the notification centre. `centre`: the entry only. `off`: nothing.",
+      "editable_by": "user",
+      "enum": [
+        "toast",
+        "centre",
+        "off"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__TYPES_EVALUATIONS"
+      ],
+      "key": "notifications.types.evaluations",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Evaluations and reports",
+      "type": "string"
+    },
+    {
+      "default": "toast",
+      "description": "A model version changed stage or was deployed. `toast`: a toast and an entry in the notification centre. `centre`: the entry only. `off`: nothing.",
+      "editable_by": "user",
+      "enum": [
+        "toast",
+        "centre",
+        "off"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__TYPES_MODELS"
+      ],
+      "key": "notifications.types.models",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Models",
+      "type": "string"
+    },
+    {
+      "default": "toast",
+      "description": "A data-preparation step or an AI agent's plan waits for a decision, or was approved or refused. `toast`: a toast and an entry in the notification centre. `centre`: the entry only. `off`: nothing.",
+      "editable_by": "user",
+      "enum": [
+        "toast",
+        "centre",
+        "off"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__TYPES_APPROVALS"
+      ],
+      "key": "notifications.types.approvals",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Approvals",
+      "type": "string"
+    },
+    {
+      "default": "toast",
+      "description": "A worker went offline, a pool has no capacity, or a cloud pod is about to be released. `toast`: a toast and an entry in the notification centre. `centre`: the entry only. `off`: nothing.",
+      "editable_by": "user",
+      "enum": [
+        "toast",
+        "centre",
+        "off"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__TYPES_COMPUTE"
+      ],
+      "key": "notifications.types.compute",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Compute",
+      "type": "string"
+    },
+    {
+      "default": "toast",
+      "description": "Spending reached a threshold. `toast`: a toast and an entry in the notification centre. `centre`: the entry only. `off`: nothing.",
+      "editable_by": "user",
+      "enum": [
+        "toast",
+        "centre",
+        "off"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__TYPES_COST"
+      ],
+      "key": "notifications.types.cost",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Cost",
+      "type": "string"
+    },
+    {
+      "default": "toast",
+      "description": "A credential expires soon or failed its test. `toast`: a toast and an entry in the notification centre. `centre`: the entry only. `off`: nothing.",
+      "editable_by": "user",
+      "enum": [
+        "toast",
+        "centre",
+        "off"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__TYPES_CREDENTIALS"
+      ],
+      "key": "notifications.types.credentials",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Credentials",
+      "type": "string"
+    },
+    {
+      "default": "toast",
+      "description": "The app lost its server or reached it again. `toast`: a toast and an entry in the notification centre. `centre`: the entry only. `off`: nothing.",
+      "editable_by": "user",
+      "enum": [
+        "toast",
+        "centre",
+        "off"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__TYPES_CONNECTION"
+      ],
+      "key": "notifications.types.connection",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Connection",
+      "type": "string"
+    },
+    {
+      "default": "toast",
+      "description": "A newer version of Frontier is available. `toast`: a toast and an entry in the notification centre. `centre`: the entry only. `off`: nothing.",
+      "editable_by": "user",
+      "enum": [
+        "toast",
+        "centre",
+        "off"
+      ],
+      "env": [
+        "FRONTIER_NOTIFICATIONS__TYPES_UPDATES"
+      ],
+      "key": "notifications.types.updates",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Notifications",
+      "since": "0.2",
+      "title": "Updates",
+      "type": "string"
+    },
+    {
+      "default": "127.0.0.1:8787",
+      "description": "Address and port the control plane listens on.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SERVER__BIND",
+        "FRONTIER_BIND"
+      ],
+      "key": "server.bind",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Server",
+      "since": "0.2",
+      "title": "Listen address",
+      "type": "string"
+    },
+    {
+      "default": "./frontier.db",
+      "description": "SQLite database of the control plane.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SERVER__DB_PATH",
+        "FRONTIER_DB"
+      ],
+      "key": "server.db_path",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Server",
+      "since": "0.2",
+      "title": "Database file",
+      "type": "path"
+    },
+    {
+      "default": "./frontier-data",
+      "description": "Artifacts, job logs and hub pulls of the control plane.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SERVER__DATA_DIR",
+        "FRONTIER_DATA_DIR"
+      ],
+      "key": "server.data_dir",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Server",
+      "since": "0.2",
+      "title": "Data directory",
+      "type": "path"
+    },
+    {
+      "default": [],
+      "description": "Origins allowed to call the API besides localhost and the desktop app (for example https://frontier.example.com).",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SERVER__CORS_ORIGINS"
+      ],
+      "key": "server.cors_origins",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Server",
+      "since": "0.2",
+      "title": "Additional browser origins",
+      "type": "list"
+    },
+    {
+      "default": [],
+      "description": "Host names this server answers to besides localhost and the hosts of `server.cors_origins` (the public DNS name behind a proxy, a pod's proxy host). Requests with another `Host` are refused, which is what stops DNS rebinding. `*` accepts any host: only with authentication on.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SERVER__ALLOWED_HOSTS",
+        "FRONTIER_ALLOWED_HOSTS"
+      ],
+      "key": "server.allowed_hosts",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Server",
+      "since": "0.2",
+      "title": "Accepted Host names",
+      "type": "list"
+    },
+    {
+      "default": true,
+      "description": "Hand credentials stored on the server to the jobs that ask for them when a worker claims the job. When off, jobs only see what the worker's own environment provides.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_SERVER__INJECT_CREDENTIALS"
+      ],
+      "key": "server.inject_credentials",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Server",
+      "since": "0.2",
+      "title": "Give credentials to jobs",
+      "type": "bool"
+    },
+    {
+      "default": "none",
+      "description": "`none`: single-user, every request acts as the local administrator (only on a loopback address). `token`: API tokens. `oidc`: people sign in through an OpenID Connect provider; the CLI, workers and CI use API tokens.",
+      "editable_by": "admin",
+      "enum": [
+        "none",
+        "token",
+        "oidc"
+      ],
+      "env": [
+        "FRONTIER_AUTH__MODE"
+      ],
+      "key": "auth.mode",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Authentication mode",
+      "type": "string"
+    },
+    {
+      "default": false,
+      "description": "Let the server start with `auth.mode = \"none\"` on an address other machines can reach. Everyone who can connect is then an administrator.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__ALLOW_INSECURE"
+      ],
+      "key": "auth.allow_insecure",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Allow single-user mode on the network",
+      "type": "bool"
+    },
+    {
+      "default": true,
+      "description": "With `auth.mode = \"none\"`, every request that changes something or touches credentials must carry the token the server writes at start-up to `<data dir>/local-token` and `~/.frontier/servers/<port>.token` (owner-readable only). The CLI, the SDK and workers on this machine read it by themselves; the browser app obtains it from `POST /api/v1/auth/local-session`. Turning it off lets every local process and every allowed web origin act as administrator.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__LOCAL_TOKEN"
+      ],
+      "key": "auth.local_token",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Require the local token in single-user mode",
+      "type": "bool"
+    },
+    {
+      "default": false,
+      "description": "Let the server listen on an address other machines can reach although `auth.public_url` is not an https URL. Set it when TLS ends at a reverse proxy you have not described in `auth.public_url`, or on a network you trust with tokens in clear.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__ALLOW_PLAIN_HTTP"
+      ],
+      "key": "auth.allow_plain_http",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Allow a network address without TLS",
+      "type": "bool"
+    },
+    {
+      "default": false,
+      "description": "Let the person who submitted a data-preparation run or started an agent session also approve it. Off: an approval is a second person's decision (four-eyes); on, for teams with a single reviewer.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__ALLOW_SELF_APPROVAL"
+      ],
+      "key": "auth.allow_self_approval",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Allow approving one's own plans",
+      "type": "bool"
+    },
+    {
+      "default": 12,
+      "description": "How long a browser session stays valid after sign-in.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__SESSION_TTL_HOURS"
+      ],
+      "key": "auth.session_ttl_hours",
+      "max": 720.0,
+      "min": 1.0,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Session lifetime (hours)",
+      "type": "int"
+    },
+    {
+      "default": 90,
+      "description": "Lifetime of a new API token when none is asked for; 0 means it does not expire.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__TOKEN_TTL_DAYS"
+      ],
+      "key": "auth.token_ttl_days",
+      "max": 3650.0,
+      "min": 0.0,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Default API token lifetime (days)",
+      "type": "int"
+    },
+    {
+      "default": 0,
+      "description": "Upper bound for the lifetime of tokens people create for themselves; 0 means no bound. Service-account tokens issued by an administrator are not bound by it.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__TOKEN_MAX_TTL_DAYS"
+      ],
+      "key": "auth.token_max_ttl_days",
+      "max": 3650.0,
+      "min": 0.0,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Longest API token lifetime (days)",
+      "type": "int"
+    },
+    {
+      "default": "",
+      "description": "The address browsers reach the server at (for example https://frontier.example.com); the OIDC redirect URI is `<public_url>/api/v1/auth/oidc/callback`. Empty: derived from the listen address.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__PUBLIC_URL"
+      ],
+      "key": "auth.public_url",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Public URL of the control plane",
+      "type": "url"
+    },
+    {
+      "default": false,
+      "description": "Record the client address a reverse proxy reports instead of the proxy's own. Enable only behind a proxy that overwrites the header.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__TRUST_FORWARDED_FOR"
+      ],
+      "key": "auth.trust_forwarded_for",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Trust X-Forwarded-For",
+      "type": "bool"
+    },
+    {
+      "default": 0,
+      "description": "Audit records older than this are removed at start-up and daily; the chain stays verifiable from a recorded anchor. 0 keeps everything.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__AUDIT_RETENTION_DAYS"
+      ],
+      "key": "auth.audit_retention_days",
+      "max": null,
+      "min": 0.0,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Audit log retention (days)",
+      "type": "int"
+    },
+    {
+      "default": "",
+      "description": "Issuer URL of the identity provider; `<issuer>/.well-known/openid-configuration` must exist.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__OIDC_ISSUER"
+      ],
+      "key": "auth.oidc.issuer",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "OIDC issuer",
+      "type": "url"
+    },
+    {
+      "default": "",
+      "description": "Client id registered for Frontier at the provider. The client secret, if the provider issues one, is the credential `frontier-oidc` (or `FRONTIER_OIDC_CLIENT_SECRET`), never a setting.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__OIDC_CLIENT_ID"
+      ],
+      "key": "auth.oidc.client_id",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "OIDC client id",
+      "type": "string"
+    },
+    {
+      "default": [
+        "openid",
+        "profile",
+        "email"
+      ],
+      "description": "Scopes requested at sign-in; add the one that makes the provider include groups (often `groups`).",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__OIDC_SCOPES"
+      ],
+      "key": "auth.oidc.scopes",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "OIDC scopes",
+      "type": "list"
+    },
+    {
+      "default": "preferred_username",
+      "description": "Claim used as the Frontier login name; falls back to `email`, then `sub`.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__OIDC_USERNAME_CLAIM"
+      ],
+      "key": "auth.oidc.username_claim",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Login name claim",
+      "type": "string"
+    },
+    {
+      "default": "groups",
+      "description": "Claim listing the user's groups (an array or a space-separated string; dots descend, as in `realm_access.roles`).",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__OIDC_GROUPS_CLAIM"
+      ],
+      "key": "auth.oidc.groups_claim",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Groups claim",
+      "type": "string"
+    },
+    {
+      "default": {},
+      "description": "Group name to `admin`, `maintainer`, `member`, `viewer` or `auditor` (organisation role), or `project:<project name>:<role>`. The highest matching role applies and is re-evaluated at every sign-in.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_AUTH__OIDC_ROLE_MAPPING"
+      ],
+      "key": "auth.oidc.role_mapping",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Group to role mapping",
+      "type": "table"
+    },
+    {
+      "default": "",
+      "description": "Organisation role of a user none of whose groups is mapped; empty refuses the sign-in.",
+      "editable_by": "admin",
+      "enum": [
+        "",
+        "viewer",
+        "member",
+        "maintainer",
+        "admin",
+        "auditor"
+      ],
+      "env": [
+        "FRONTIER_AUTH__OIDC_DEFAULT_ROLE"
+      ],
+      "key": "auth.oidc.default_role",
+      "max": null,
+      "min": null,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Authentication",
+      "since": "0.2",
+      "title": "Role without a mapped group",
+      "type": "string"
+    },
+    {
+      "default": "local",
+      "description": "Which jobs this worker claims.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_WORKER__BACKEND",
+        "FRONTIER_BACKEND"
+      ],
+      "key": "worker.backend",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Worker",
+      "since": "0.2",
+      "title": "Backend",
+      "type": "string"
+    },
+    {
+      "default": [],
+      "description": "Labels this worker advertises (`gpu=h100`, `site=eu`); a job is claimed only by a worker with all of its labels.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_WORKER__LABELS",
+        "FRONTIER_LABELS"
+      ],
+      "key": "worker.labels",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Worker",
+      "since": "0.2",
+      "title": "Labels",
+      "type": "list"
+    },
+    {
+      "default": 10,
+      "description": "How often the worker reports to the control plane and asks for work.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_WORKER__HEARTBEAT_SECS",
+        "FRONTIER_HEARTBEAT"
+      ],
+      "key": "worker.heartbeat_secs",
+      "max": 3600.0,
+      "min": 1.0,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Worker",
+      "since": "0.2",
+      "title": "Heartbeat interval (seconds)",
+      "type": "int"
+    },
+    {
+      "default": ".",
+      "description": "Directory jobs run in when they do not name one.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_WORKER__WORKDIR",
+        "FRONTIER_WORKDIR"
+      ],
+      "key": "worker.workdir",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Worker",
+      "since": "0.2",
+      "title": "Working directory",
+      "type": "path"
+    },
+    {
+      "default": false,
+      "description": "Run a job's image with Docker instead of as a bare process.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_WORKER__USE_DOCKER",
+        "FRONTIER_USE_DOCKER"
+      ],
+      "key": "worker.use_docker",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Worker",
+      "since": "0.2",
+      "title": "Run jobs in containers",
+      "type": "bool"
+    },
+    {
+      "default": [],
+      "description": "Names of environment variables of the worker process that jobs inherit, besides the basic ones (PATH, HOME, locale, temporary directory, CUDA/NVIDIA, Python and proxy variables). A job never inherits the worker's token or any other variable by default: what it needs comes with the job.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_WORKER__JOB_ENV_PASSTHROUGH"
+      ],
+      "key": "worker.job_env_passthrough",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Worker",
+      "since": "0.2",
+      "title": "Worker variables jobs may see",
+      "type": "list"
+    },
+    {
+      "default": "",
+      "description": "Operating-system user jobs are started as when the worker runs as root (containers, system services), so a job cannot read the worker's files or signal it. Empty runs jobs as the worker's own user.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_WORKER__JOB_USER"
+      ],
+      "key": "worker.job_user",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Worker",
+      "since": "0.2",
+      "title": "User that jobs run as",
+      "type": "string"
+    },
+    {
+      "default": 300,
+      "description": "Time a cancelled job gets between SIGTERM and SIGKILL. The job uses it to stop its step and to pack and upload what it produced (checkpoints, metrics, evaluation files).",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_WORKER__TERM_GRACE_SECS",
+        "FRONTIER_TERM_GRACE"
+      ],
+      "key": "worker.term_grace_secs",
+      "max": 86400.0,
+      "min": 0.0,
+      "restart_required": false,
+      "scope": "system",
+      "secret": false,
+      "section": "Worker",
+      "since": "0.2",
+      "title": "Termination grace (seconds)",
+      "type": "int"
+    },
+    {
+      "default": 268435456,
+      "description": "Largest JSON request (metric batches, job logs) the control plane accepts. Artifact uploads are streamed and not limited by this.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_LIMITS__MAX_REQUEST_BYTES"
+      ],
+      "key": "limits.max_request_bytes",
+      "max": null,
+      "min": 1024.0,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Limits",
+      "since": "0.2",
+      "title": "Request size limit",
+      "type": "bytes"
+    },
+    {
+      "default": 53687091200,
+      "description": "Upper bound on one uploaded run artifact (checkpoints, prediction stores, model packages). A larger upload is cut off and removed.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_LIMITS__MAX_ARTIFACT_BYTES"
+      ],
+      "key": "limits.max_artifact_bytes",
+      "max": null,
+      "min": 1024.0,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Limits",
+      "since": "0.2",
+      "title": "Largest artifact upload",
+      "type": "bytes"
+    },
+    {
+      "default": 536870912000,
+      "description": "Upper bound on the total size of one run's artifacts; an upload that would exceed it is refused. 0 means no bound.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_LIMITS__MAX_RUN_ARTIFACT_BYTES"
+      ],
+      "key": "limits.max_run_artifact_bytes",
+      "max": null,
+      "min": 0.0,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Limits",
+      "since": "0.2",
+      "title": "Artifact space per run",
+      "type": "bytes"
+    },
+    {
+      "default": 1073741824,
+      "description": "Uploads are refused while the data directory's file system has less free space than this, so the database and job logs can still be written. 0 turns the check off.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_LIMITS__MIN_FREE_DISK_BYTES"
+      ],
+      "key": "limits.min_free_disk_bytes",
+      "max": null,
+      "min": 0.0,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Limits",
+      "since": "0.2",
+      "title": "Free disk space to keep",
+      "type": "bytes"
+    },
+    {
+      "default": 300,
+      "description": "A request whose handler has not answered after this long is ended with 504. Event streams and downloads are not cut (they answer at once and then stream); artifact uploads are exempt. 0 means no timeout.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_LIMITS__REQUEST_TIMEOUT_SECS"
+      ],
+      "key": "limits.request_timeout_secs",
+      "max": null,
+      "min": 0.0,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Limits",
+      "since": "0.2",
+      "title": "Request timeout (seconds)",
+      "type": "int"
+    },
+    {
+      "default": 32,
+      "description": "Live event streams (run events, agent sessions, model events) one caller may hold open at a time; further ones are refused with 429. 0 means no bound.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_LIMITS__MAX_EVENT_STREAMS_PER_CLIENT"
+      ],
+      "key": "limits.max_event_streams_per_client",
+      "max": null,
+      "min": 0.0,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Limits",
+      "since": "0.2",
+      "title": "Event streams per client",
+      "type": "int"
+    },
+    {
+      "default": 512,
+      "description": "Requests the control plane works on at once, open event streams included; further ones wait.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_LIMITS__MAX_CONCURRENT_REQUESTS"
+      ],
+      "key": "limits.max_concurrent_requests",
+      "max": 65536.0,
+      "min": 8.0,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Limits",
+      "since": "0.2",
+      "title": "Concurrent requests",
+      "type": "int"
+    },
+    {
+      "default": 30,
+      "description": "After this many rejected tokens, sessions or sign-ins from one address within a minute, further rejected attempts from it are answered 429 and no longer written to the audit log until the minute has passed. Valid credentials keep working. 0 turns the limit off.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_LIMITS__FAILED_AUTH_PER_MINUTE"
+      ],
+      "key": "limits.failed_auth_per_minute",
+      "max": null,
+      "min": 0.0,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Limits",
+      "since": "0.2",
+      "title": "Rejected sign-ins per minute and address",
+      "type": "int"
+    },
+    {
+      "default": 4294967296,
+      "description": "Upper bound on the memory one read of a dataset or prediction array may need. A store whose metadata declares more is refused instead of loaded, so a hostile or corrupt upload cannot exhaust the server's memory.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_LIMITS__MAX_ARRAY_BYTES"
+      ],
+      "key": "limits.max_array_bytes",
+      "max": null,
+      "min": 1048576.0,
+      "restart_required": true,
+      "scope": "system",
+      "secret": false,
+      "section": "Limits",
+      "since": "0.2",
+      "title": "Largest array read at once",
+      "type": "bytes"
+    },
+    {
+      "default": [
+        "local",
+        "ssh",
+        "slurm",
+        "k8s",
+        "runpod",
+        "anyscale"
+      ],
+      "description": "Targets runs may be sent to. Remove `runpod` and `anyscale` to keep every run on your own machines.",
+      "editable_by": "admin",
+      "enum": [
+        "local",
+        "ssh",
+        "slurm",
+        "k8s",
+        "runpod",
+        "anyscale"
+      ],
+      "env": [
+        "FRONTIER_POLICY__ALLOW_CLOUD_TARGETS"
+      ],
+      "key": "policy.allow_cloud_targets",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Allowed compute targets",
+      "type": "list"
+    },
+    {
+      "default": true,
+      "description": "When off, `frontier hub pull` and the app refuse to download from public hosts; only catalogue entries served from `hub.extra_catalogs` on local paths remain available.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__ALLOW_PUBLIC_HUB"
+      ],
+      "key": "policy.allow_public_hub",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Allow public dataset downloads",
+      "type": "bool"
+    },
+    {
+      "default": [
+        "any"
+      ],
+      "description": "Which hub datasets may be pulled: `any`, `commercial` (licences that permit commercial use), or SPDX identifiers (for example CC-BY-4.0). A dataset must match at least one entry.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__ALLOWED_DATASET_LICENCES"
+      ],
+      "key": "policy.allowed_dataset_licences",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Allowed dataset licences",
+      "type": "list"
+    },
+    {
+      "default": 0.0,
+      "description": "Upper bound for the cost ceiling of any cloud run or sweep. 0 means no organisation-wide ceiling.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__MAX_COST_PER_RUN"
+      ],
+      "key": "policy.max_cost_per_run",
+      "max": null,
+      "min": 0.0,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Cost ceiling per run (USD)",
+      "type": "float"
+    },
+    {
+      "default": true,
+      "description": "When off, the set of plugins is frozen: nobody can install, uninstall, enable or disable a plugin or deploy an exporter from the CLI or the app. Administrators change plugins by changing the installation.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__ALLOW_PLUGIN_CHANGES"
+      ],
+      "key": "policy.allow_plugin_changes",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Allow plugin changes",
+      "type": "bool"
+    },
+    {
+      "default": [
+        "bundled",
+        "pypi",
+        "index",
+        "wheel_dir"
+      ],
+      "description": "Where plugins may be installed from: `bundled` (shipped with the product), `pypi` (the official index), `index` (the configured `plugins.index_url`), `wheel_dir` (the configured wheel directory), a URL or path prefix, or `any`. The default is the official index plus what an administrator configured; a path, wheel or URL named on a command line needs its prefix listed here (or `any`).",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__PLUGIN_SOURCES"
+      ],
+      "key": "policy.plugin_sources",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Allowed plugin sources",
+      "type": "list"
+    },
+    {
+      "default": [
+        "any"
+      ],
+      "description": "Pools a run or job may ask for: `any`, or pool names. A job that names another pool is refused; `auto` always resolves inside the allowed pools.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__COMPUTE_ALLOWED_POOLS"
+      ],
+      "key": "policy.compute_allowed_pools",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Allowed compute pools",
+      "type": "list"
+    },
+    {
+      "default": 0,
+      "description": "Largest number of GPUs (over all nodes) one run or job may hold. 0 means no organisation-wide ceiling.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__COMPUTE_MAX_GPUS_PER_RUN"
+      ],
+      "key": "policy.compute_max_gpus_per_run",
+      "max": null,
+      "min": 0.0,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "GPUs per run (ceiling)",
+      "type": "int"
+    },
+    {
+      "default": [
+        "local"
+      ],
+      "description": "Provider ids an agent session or a judge may use: `local` (covers `ollama`, `vllm`, `llamacpp`, `rules`, `nli`), `anthropic`, `openai`, `typesafe`, or `any`.",
+      "editable_by": "admin",
+      "enum": [
+        "local",
+        "ollama",
+        "vllm",
+        "llamacpp",
+        "rules",
+        "nli",
+        "anthropic",
+        "openai",
+        "typesafe",
+        "any"
+      ],
+      "env": [
+        "FRONTIER_POLICY__AI_ALLOWED_PROVIDERS"
+      ],
+      "key": "policy.ai.allowed_providers",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Allowed model providers",
+      "type": "list"
+    },
+    {
+      "default": false,
+      "description": "When off, every hosted model provider (anthropic, openai, typesafe) is refused whatever `allowed_providers` says: plan and preview summaries would be sent off-site.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__AI_DATA_LEAVES_SITE"
+      ],
+      "key": "policy.ai.data_leaves_site",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Allow data to leave the site",
+      "type": "bool"
+    },
+    {
+      "default": [],
+      "description": "Operation classes (`prep.fields`, `prep.samples.drop`, `all`) an agent may `run` without a person's approval. Empty means every run needs an approval.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__AI_AUTONOMOUS_OP_CLASSES"
+      ],
+      "key": "policy.ai.autonomous_op_classes",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Op classes an agent may run unattended",
+      "type": "list"
+    },
+    {
+      "default": "local",
+      "description": "Who may change the settings a server reads when it starts (listen address, sign-in mode, limits, the secret store) through the API, the app and `frontier config set --on-server`, and restart it from there. `local`: only in single-user mode from this machine, written to the server's own config file. `admin`: any administrator who is signed in. `off`: only by editing the config file.",
+      "editable_by": "admin",
+      "enum": [
+        "local",
+        "admin",
+        "off"
+      ],
+      "env": [
+        "FRONTIER_POLICY__SETTINGS_EDIT_STARTUP"
+      ],
+      "key": "policy.settings.edit_startup",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Start-up settings from the app",
+      "type": "string"
+    },
+    {
+      "default": false,
+      "description": "When on, an inference may send a signed POST to a URL when its predictions are ready (`notify` in the API, \"Notify URL\" on an Inference node). The request carries ids and links, never arrays.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__INFERENCE_WEBHOOKS"
+      ],
+      "key": "policy.inference.webhooks",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Allow inference webhooks",
+      "type": "bool"
+    },
+    {
+      "default": [],
+      "description": "Host names a notify URL may point at. Empty means any host, once webhooks are allowed.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__INFERENCE_WEBHOOK_HOSTS"
+      ],
+      "key": "policy.inference.webhook_hosts",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Hosts an inference may notify",
+      "type": "list"
+    },
+    {
+      "default": "auto",
+      "description": "`auto` picks TypeSafe when allowed and configured, else the local model when its endpoint answers, else rules; or name one of `local`, `rules`, `nli`, `typesafe`.",
+      "editable_by": "user",
+      "enum": [
+        "auto",
+        "local",
+        "rules",
+        "nli",
+        "typesafe"
+      ],
+      "env": [
+        "FRONTIER_POLICY__AI_JUDGE_BACKEND"
+      ],
+      "key": "policy.ai.judge_backend",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Judge backend",
+      "type": "string"
+    },
+    {
+      "default": "http://localhost:11434",
+      "description": "The local model server (Ollama native API; an endpoint ending in `/v1` is treated as OpenAI-compatible: vLLM, llama.cpp server).",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__AI_LOCAL_ENDPOINT"
+      ],
+      "key": "policy.ai.local_endpoint",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Local model endpoint",
+      "type": "url"
+    },
+    {
+      "default": [],
+      "description": "Host names (or `host:port`) besides this machine that the provider `local` may reach: a model server inside the site's network. Anything else is treated as data leaving the site. Read from the system file and the control plane only.",
+      "editable_by": "admin",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__AI_LOCAL_ENDPOINTS"
+      ],
+      "key": "policy.ai.local_endpoints",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "server",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Hosts that count as local model servers",
+      "type": "list"
+    },
+    {
+      "default": "",
+      "description": "Model tag on the local endpoint used for judgments and local agent sessions.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__AI_LOCAL_MODEL"
+      ],
+      "key": "policy.ai.local_model",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Local model",
+      "type": "string"
+    },
+    {
+      "default": "anthropic",
+      "description": "The hosted provider for `--hosted` sessions (needs `data_leaves_site` and a credential: `frontier auth login anthropic`).",
+      "editable_by": "user",
+      "enum": [
+        "anthropic",
+        "openai",
+        "typesafe"
+      ],
+      "env": [
+        "FRONTIER_POLICY__AI_HOSTED_PROVIDER"
+      ],
+      "key": "policy.ai.hosted_provider",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Hosted provider",
+      "type": "string"
+    },
+    {
+      "default": "",
+      "description": "Model id at the hosted provider for `--hosted` sessions.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__AI_HOSTED_MODEL"
+      ],
+      "key": "policy.ai.hosted_model",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Hosted model",
+      "type": "string"
+    },
+    {
+      "default": 40,
+      "description": "Budget of tool calls one agent session may make.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__AI_MAX_TOOL_CALLS"
+      ],
+      "key": "policy.ai.max_tool_calls",
+      "max": 10000.0,
+      "min": 1.0,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Tool calls per session",
+      "type": "int"
+    },
+    {
+      "default": "~/.frontier/agent-sessions",
+      "description": "Where session records (`<id>.jsonl`: every tool call, preview, judgment and approval) are written.",
+      "editable_by": "user",
+      "enum": null,
+      "env": [
+        "FRONTIER_POLICY__AI_SESSION_DIR"
+      ],
+      "key": "policy.ai.session_dir",
+      "max": null,
+      "min": null,
+      "restart_required": false,
+      "scope": "user",
+      "secret": false,
+      "section": "Policy",
+      "since": "0.2",
+      "title": "Session record directory",
+      "type": "path"
+    }
+  ],
+  "version": 1
+}

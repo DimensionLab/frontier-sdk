@@ -1,0 +1,40 @@
+[package]
+name = "frontier-config"
+description = "Layered configuration (schema registry, loader, policy) and the credential provider registry and resolver for DimensionLab Frontier"
+version.workspace = true
+edition.workspace = true
+license = "Apache-2.0"
+authors.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# OS keychain secret store (macOS Keychain, Windows Credential Manager; Secret Service through
+# `secret-tool` on Linux, which needs no native library at build time).
+keychain = ["dep:keyring"]
+# Credential tests (`frontier auth test`) over HTTP.
+http = ["dep:reqwest", "dep:sha2", "dep:base64", "dep:getrandom", "dep:tokio", "dep:rsa"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+toml_edit = "0.23"
+thiserror.workspace = true
+tracing.workspace = true
+chrono.workspace = true
+dirs = "6"
+reqwest = { workspace = true, optional = true }
+sha2 = { version = "0.10", optional = true }
+base64 = { version = "0.22", optional = true }
+getrandom = { version = "0.3", optional = true }
+tokio = { workspace = true, optional = true }
+# RS256 for Google service-account assertions (the same crate frontier-auth verifies ID tokens with)
+rsa = { version = "0.9", default-features = false, features = ["std", "pem", "sha2"], optional = true }
+
+[target.'cfg(any(target_os = "macos", target_os = "windows"))'.dependencies]
+keyring = { version = "3", default-features = false, features = ["apple-native", "windows-native"], optional = true }
+
+[dev-dependencies]
+tempfile = "3"
+tokio = { workspace = true }
