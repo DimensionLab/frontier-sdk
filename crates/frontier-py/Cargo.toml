@@ -1,4 +1,5 @@
 [package]
+workspace = "../.."
 name = "frontier-py"
 description = "PyO3 bindings exposing Frontier's Rust core to the Python SDK (module `frontier_native`)"
 version.workspace = true

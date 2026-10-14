@@ -1,4 +1,5 @@
 [package]
+workspace = "../.."
 name = "frontier-config"
 description = "Layered configuration (schema registry, loader, policy) and the credential provider registry and resolver for DimensionLab Frontier"
 version.workspace = true

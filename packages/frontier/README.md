@@ -29,11 +29,11 @@ run.finish()  # or: with frontier.init(...) as run: ...
 Every run is written under `.frontier/<project>/`. Change the directory with `FRONTIER_DIR`
 or `directory=`.
 
-| File | Contents |
-|---|---|
-| `<run_id>.run.json` | Config, state (`running`, `finished`, `failed`) and summary |
-| `<run_id>.metrics.jsonl` | One line of metrics per logged step |
-| `<run_id>/artifacts/<name>` | Copies of the files passed to `log_artifact` |
+| File                        | Contents                                                    |
+| --------------------------- | ----------------------------------------------------------- |
+| `<run_id>.run.json`         | Config, state (`running`, `finished`, `failed`) and summary |
+| `<run_id>.metrics.jsonl`    | One line of metrics per logged step                         |
+| `<run_id>/artifacts/<name>` | Copies of the files passed to `log_artifact`                |
 
 To also send a run to a server, pass `server="https://frontier.example.com"` to
 `frontier.init` or set `FRONTIER_SERVER`. `FRONTIER_TOKEN` is sent as a bearer token when
@@ -41,13 +41,13 @@ set. If the server cannot be reached, the run logs one warning and continues on 
 
 ## API
 
-| Name | What it does |
-|---|---|
-| `frontier.init(...)` | Start a run and return a `Run` |
+| Name                                                       | What it does                                               |
+| ---------------------------------------------------------- | ---------------------------------------------------------- |
+| `frontier.init(...)`                                       | Start a run and return a `Run`                             |
 | `Run.log`, `Run.log_artifact`, `Run.summary`, `Run.finish` | Record metrics, files and final values, then close the run |
-| `frontier.ServerClient` | Call the server API ([spec](../../docs/spec/api.md)) |
-| `frontier.config` | Read Frontier settings  |
-| `frontier.auth` | Read stored credentials |
+| `frontier.ServerClient`                                    | Call the server API ([spec](../../docs/spec/api.md))       |
+| `frontier.config`                                          | Read Frontier settings                                     |
+| `frontier.auth`                                            | Read stored credentials                                    |
 
 ## Licence
 

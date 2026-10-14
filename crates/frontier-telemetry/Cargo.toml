@@ -1,4 +1,5 @@
 [package]
+workspace = "../.."
 name = "frontier-telemetry"
 description = "Run telemetry: metric ingestion, sinks and local JSONL/Arrow storage"
 version.workspace = true
