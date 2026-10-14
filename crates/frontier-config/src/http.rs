@@ -97,9 +97,13 @@ impl OfflineAllow {
             return true;
         }
         match host.parse::<std::net::IpAddr>() {
-            Ok(std::net::IpAddr::V4(ip)) => ip.is_loopback() || ip.is_private() || ip.is_link_local(),
+            Ok(std::net::IpAddr::V4(ip)) => {
+                ip.is_loopback() || ip.is_private() || ip.is_link_local()
+            }
             Ok(std::net::IpAddr::V6(ip)) => {
-                ip.is_loopback() || (ip.segments()[0] & 0xfe00) == 0xfc00 || (ip.segments()[0] & 0xffc0) == 0xfe80
+                ip.is_loopback()
+                    || (ip.segments()[0] & 0xfe00) == 0xfc00
+                    || (ip.segments()[0] & 0xffc0) == 0xfe80
             }
             Err(_) => false,
         }
@@ -219,32 +223,58 @@ mod tests {
             &[
                 ("FRONTIER_OFFLINE", "true"),
                 ("FRONTIER_SERVER", "https://frontier.site.example"),
-                ("FRONTIER_NETWORK__OFFLINE_ALLOW_HOSTS", "vault.site.example"),
+                (
+                    "FRONTIER_NETWORK__OFFLINE_ALLOW_HOSTS",
+                    "vault.site.example",
+                ),
             ],
         );
         let allow = OfflineAllow::from_config(&c);
         for ok in [
-            "http://127.0.0.1:8787/x", "http://localhost:1", "http://[::1]:8787", "http://10.1.2.3/", "https://192.168.1.5:8200",
-            "http://169.254.169.254/latest", "https://frontier.site.example/api", "https://vault.site.example:8200/v1",
+            "http://127.0.0.1:8787/x",
+            "http://localhost:1",
+            "http://[::1]:8787",
+            "http://10.1.2.3/",
+            "https://192.168.1.5:8200",
+            "http://169.254.169.254/latest",
+            "https://frontier.site.example/api",
+            "https://vault.site.example:8200/v1",
         ] {
             assert!(allow.allows(ok), "{ok}");
             assert!(require_online(&c, "x", ok).is_ok());
         }
         for blocked in [
-            "https://huggingface.co/api", "https://pypi.org/simple", "https://8.8.8.8/", "https://127.0.0.1.evil.example/",
-            "https://user@evil.example/", "https://vault.site.example.evil.example/", "not a url",
+            "https://huggingface.co/api",
+            "https://pypi.org/simple",
+            "https://8.8.8.8/",
+            "https://127.0.0.1.evil.example/",
+            "https://user@evil.example/",
+            "https://vault.site.example.evil.example/",
+            "not a url",
         ] {
             assert!(!allow.allows(blocked), "{blocked}");
         }
-        let e = require_online(&c, "pulling from the hub", "https://huggingface.co/api").unwrap_err();
-        assert!(e.contains("network.offline") && e.contains("pulling from the hub"), "{e}");
+        let e =
+            require_online(&c, "pulling from the hub", "https://huggingface.co/api").unwrap_err();
+        assert!(
+            e.contains("network.offline") && e.contains("pulling from the hub"),
+            "{e}"
+        );
         // the backstop: a request nobody guarded fails at once instead of going out
         // (192.0.2.0/24 is reserved for documentation: a real attempt would hang)
-        let client = client_builder(&c).unwrap().timeout(std::time::Duration::from_secs(20)).build().unwrap();
+        let client = client_builder(&c)
+            .unwrap()
+            .timeout(std::time::Duration::from_secs(20))
+            .build()
+            .unwrap();
         let started = std::time::Instant::now();
         assert!(client.get("http://192.0.2.1:9/").send().await.is_err());
         assert!(client.get("https://192.0.2.1/").send().await.is_err());
-        assert!(started.elapsed() < std::time::Duration::from_secs(5), "{:?}", started.elapsed());
+        assert!(
+            started.elapsed() < std::time::Duration::from_secs(5),
+            "{:?}",
+            started.elapsed()
+        );
         // online: no guard
         let online = config(dir.path(), &[]);
         assert!(require_online(&online, "x", "https://huggingface.co").is_ok());

@@ -1123,8 +1123,12 @@ pub fn open_remote(config: &Config, backend: &str) -> Result<Box<dyn SecretStore
     match backend {
         "vault" => Ok(Box::new(VaultStore::from_config(config)?)),
         "aws" => Ok(Box::new(AwsSecretsManagerStore::from_config(config)?)),
-        "azure" => Ok(Box::new(super::remote_cloud::AzureKeyVaultStore::from_config(config)?)),
-        "gcp" => Ok(Box::new(super::remote_cloud::GcpSecretManagerStore::from_config(config)?)),
+        "azure" => Ok(Box::new(
+            super::remote_cloud::AzureKeyVaultStore::from_config(config)?,
+        )),
+        "gcp" => Ok(Box::new(
+            super::remote_cloud::GcpSecretManagerStore::from_config(config)?,
+        )),
         other => Err(err(format!(
             "`{other}` is not a remote secret store (vault, aws)"
         ))),

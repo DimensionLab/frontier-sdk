@@ -21,9 +21,13 @@ frontier = { workspace = true }
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+src = ["packages/*/src"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N", "W"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["frontier", "frontier_agent", "frontier_connectors", "frontier_data", "frontier_deploy", "frontier_eval", "frontier_examples", "frontier_explain", "frontier_hub", "frontier_physicsnemo", "frontier_planner", "frontier_prep", "frontier_train"]
 
 [tool.pytest.ini_options]
 testpaths = ["packages/frontier/"]
