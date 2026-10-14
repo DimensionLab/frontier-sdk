@@ -1,10 +1,14 @@
 [
   {
     "category": "Frontier",
-    "env": ["FRONTIER_TOKEN"],
+    "env": [
+      "FRONTIER_TOKEN"
+    ],
     "fields": [
       {
-        "env": ["FRONTIER_TOKEN"],
+        "env": [
+          "FRONTIER_TOKEN"
+        ],
         "name": "token",
         "required": true,
         "secret": true,
@@ -18,10 +22,14 @@
   },
   {
     "category": "Frontier",
-    "env": ["FRONTIER_OIDC_CLIENT_SECRET"],
+    "env": [
+      "FRONTIER_OIDC_CLIENT_SECRET"
+    ],
     "fields": [
       {
-        "env": ["FRONTIER_OIDC_CLIENT_SECRET"],
+        "env": [
+          "FRONTIER_OIDC_CLIENT_SECRET"
+        ],
         "name": "client_secret",
         "required": true,
         "secret": true,
@@ -35,10 +43,16 @@
   },
   {
     "category": "Datasets hub",
-    "env": ["HF_TOKEN", "HUGGING_FACE_HUB_TOKEN"],
+    "env": [
+      "HF_TOKEN",
+      "HUGGING_FACE_HUB_TOKEN"
+    ],
     "fields": [
       {
-        "env": ["HF_TOKEN", "HUGGING_FACE_HUB_TOKEN"],
+        "env": [
+          "HF_TOKEN",
+          "HUGGING_FACE_HUB_TOKEN"
+        ],
         "name": "token",
         "required": true,
         "secret": true,
@@ -61,10 +75,14 @@
   },
   {
     "category": "Cloud compute",
-    "env": ["RUNPOD_API_KEY"],
+    "env": [
+      "RUNPOD_API_KEY"
+    ],
     "fields": [
       {
-        "env": ["RUNPOD_API_KEY"],
+        "env": [
+          "RUNPOD_API_KEY"
+        ],
         "name": "api_key",
         "required": true,
         "secret": true,
@@ -85,24 +103,32 @@
   },
   {
     "category": "Cloud compute",
-    "env": ["ANYSCALE_API_KEY"],
+    "env": [
+      "ANYSCALE_API_KEY"
+    ],
     "fields": [
       {
-        "env": ["ANYSCALE_API_KEY"],
+        "env": [
+          "ANYSCALE_API_KEY"
+        ],
         "name": "api_key",
         "required": true,
         "secret": true,
         "title": "API key"
       },
       {
-        "env": ["ANYSCALE_CLOUD_ID"],
+        "env": [
+          "ANYSCALE_CLOUD_ID"
+        ],
         "name": "cloud_id",
         "required": false,
         "secret": false,
         "title": "Cloud id"
       },
       {
-        "env": ["ANYSCALE_PROJECT_ID"],
+        "env": [
+          "ANYSCALE_PROJECT_ID"
+        ],
         "name": "project_id",
         "required": false,
         "secret": false,
@@ -122,10 +148,14 @@
   },
   {
     "category": "Cloud solvers",
-    "env": ["FLOW360_APIKEY"],
+    "env": [
+      "FLOW360_APIKEY"
+    ],
     "fields": [
       {
-        "env": ["FLOW360_APIKEY"],
+        "env": [
+          "FLOW360_APIKEY"
+        ],
         "name": "api_key",
         "required": true,
         "secret": true,
@@ -144,10 +174,14 @@
   },
   {
     "category": "Cloud solvers",
-    "env": ["LC_API_KEY"],
+    "env": [
+      "LC_API_KEY"
+    ],
     "fields": [
       {
-        "env": ["LC_API_KEY"],
+        "env": [
+          "LC_API_KEY"
+        ],
         "name": "api_key",
         "required": true,
         "secret": true,
@@ -162,17 +196,23 @@
   },
   {
     "category": "Cloud solvers",
-    "env": ["SIMSCALE_API_KEY"],
+    "env": [
+      "SIMSCALE_API_KEY"
+    ],
     "fields": [
       {
-        "env": ["SIMSCALE_API_KEY"],
+        "env": [
+          "SIMSCALE_API_KEY"
+        ],
         "name": "api_key",
         "required": true,
         "secret": true,
         "title": "API key"
       },
       {
-        "env": ["SIMSCALE_API_URL"],
+        "env": [
+          "SIMSCALE_API_URL"
+        ],
         "name": "api_url",
         "required": false,
         "secret": false,
@@ -193,17 +233,23 @@
   },
   {
     "category": "Cloud solvers",
-    "env": ["RESCALE_API_KEY"],
+    "env": [
+      "RESCALE_API_KEY"
+    ],
     "fields": [
       {
-        "env": ["RESCALE_API_KEY"],
+        "env": [
+          "RESCALE_API_KEY"
+        ],
         "name": "api_key",
         "required": true,
         "secret": true,
         "title": "API token"
       },
       {
-        "env": ["RESCALE_API_URL"],
+        "env": [
+          "RESCALE_API_URL"
+        ],
         "name": "api_url",
         "required": false,
         "secret": false,
@@ -228,35 +274,45 @@
     "env": [],
     "fields": [
       {
-        "env": ["AWS_ACCESS_KEY_ID"],
+        "env": [
+          "AWS_ACCESS_KEY_ID"
+        ],
         "name": "access_key_id",
         "required": true,
         "secret": false,
         "title": "Access key id"
       },
       {
-        "env": ["AWS_SECRET_ACCESS_KEY"],
+        "env": [
+          "AWS_SECRET_ACCESS_KEY"
+        ],
         "name": "secret_access_key",
         "required": true,
         "secret": true,
         "title": "Secret access key"
       },
       {
-        "env": ["AWS_SESSION_TOKEN"],
+        "env": [
+          "AWS_SESSION_TOKEN"
+        ],
         "name": "session_token",
         "required": false,
         "secret": true,
         "title": "Session token"
       },
       {
-        "env": ["AWS_DEFAULT_REGION"],
+        "env": [
+          "AWS_DEFAULT_REGION"
+        ],
         "name": "region",
         "required": false,
         "secret": false,
         "title": "Region"
       },
       {
-        "env": ["AWS_ENDPOINT_URL"],
+        "env": [
+          "AWS_ENDPOINT_URL"
+        ],
         "name": "endpoint_url",
         "required": false,
         "secret": false,
@@ -274,7 +330,9 @@
     "env": [],
     "fields": [
       {
-        "env": ["GOOGLE_APPLICATION_CREDENTIALS"],
+        "env": [
+          "GOOGLE_APPLICATION_CREDENTIALS"
+        ],
         "name": "credentials_file",
         "required": true,
         "secret": false,
@@ -292,14 +350,18 @@
     "env": [],
     "fields": [
       {
-        "env": ["AZURE_STORAGE_ACCOUNT"],
+        "env": [
+          "AZURE_STORAGE_ACCOUNT"
+        ],
         "name": "account",
         "required": true,
         "secret": false,
         "title": "Storage account"
       },
       {
-        "env": ["AZURE_STORAGE_KEY"],
+        "env": [
+          "AZURE_STORAGE_KEY"
+        ],
         "name": "key",
         "required": true,
         "secret": true,
@@ -317,21 +379,27 @@
     "env": [],
     "fields": [
       {
-        "env": ["FRONTIER_REGISTRY_SERVER"],
+        "env": [
+          "FRONTIER_REGISTRY_SERVER"
+        ],
         "name": "server",
         "required": true,
         "secret": false,
         "title": "Registry host"
       },
       {
-        "env": ["FRONTIER_REGISTRY_USERNAME"],
+        "env": [
+          "FRONTIER_REGISTRY_USERNAME"
+        ],
         "name": "username",
         "required": true,
         "secret": false,
         "title": "User name"
       },
       {
-        "env": ["FRONTIER_REGISTRY_PASSWORD"],
+        "env": [
+          "FRONTIER_REGISTRY_PASSWORD"
+        ],
         "name": "password",
         "required": true,
         "secret": true,
@@ -348,14 +416,18 @@
     "env": [],
     "fields": [
       {
-        "env": ["FRONTIER_SSH_USER"],
+        "env": [
+          "FRONTIER_SSH_USER"
+        ],
         "name": "user",
         "required": true,
         "secret": false,
         "title": "Login name"
       },
       {
-        "env": ["FRONTIER_SSH_IDENTITY"],
+        "env": [
+          "FRONTIER_SSH_IDENTITY"
+        ],
         "name": "identity_file",
         "required": false,
         "secret": false,
@@ -376,10 +448,14 @@
   },
   {
     "category": "Model providers",
-    "env": ["ANTHROPIC_API_KEY"],
+    "env": [
+      "ANTHROPIC_API_KEY"
+    ],
     "fields": [
       {
-        "env": ["ANTHROPIC_API_KEY"],
+        "env": [
+          "ANTHROPIC_API_KEY"
+        ],
         "name": "api_key",
         "required": true,
         "secret": true,
@@ -399,17 +475,23 @@
   },
   {
     "category": "Model providers",
-    "env": ["OPENAI_API_KEY"],
+    "env": [
+      "OPENAI_API_KEY"
+    ],
     "fields": [
       {
-        "env": ["OPENAI_API_KEY"],
+        "env": [
+          "OPENAI_API_KEY"
+        ],
         "name": "api_key",
         "required": true,
         "secret": true,
         "title": "API key"
       },
       {
-        "env": ["OPENAI_BASE_URL"],
+        "env": [
+          "OPENAI_BASE_URL"
+        ],
         "name": "base_url",
         "required": false,
         "secret": false,
@@ -431,10 +513,14 @@
   },
   {
     "category": "Model providers",
-    "env": ["TYPESAFE_API_KEY"],
+    "env": [
+      "TYPESAFE_API_KEY"
+    ],
     "fields": [
       {
-        "env": ["TYPESAFE_API_KEY"],
+        "env": [
+          "TYPESAFE_API_KEY"
+        ],
         "name": "api_key",
         "required": true,
         "secret": true,
