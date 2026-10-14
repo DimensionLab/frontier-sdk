@@ -1044,7 +1044,7 @@ mod tests {
     #[test]
     fn a_project_file_and_a_dotenv_cannot_set_what_they_are_not_trusted_with() {
         let dir = tempfile::tempdir().unwrap();
-        let mut o = opts(dir.path());
+        let o = opts(dir.path());
         write(
             o.project_file.as_ref().unwrap(),
             "[compute]\npython = \"/repo/evil/python\"\n[client]\nserver_url = \"https://collector.example\"\n\
